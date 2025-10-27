@@ -1,13 +1,46 @@
+@import "tailwindcss";
+
+html,
 body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+	margin: 0;
+	background-color: #020617;
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+.app-header,
+.header-logo,
+.nav-links,
+.register-button,
+.hero-subheading,
+.hero-main-heading {
+	opacity: 0;
+	transform: translateY(10px);
+	transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+* {
+	scrollbar-width: thin;
+	scrollbar-color: #000 transparent;
+}
+
+*::-webkit-scrollbar {
+	width: 4px;
+	background-color: transparent;
+}
+
+*::-webkit-scrollbar-track,
+*::-webkit-scrollbar-track-piece,
+*::-webkit-scrollbar-corner {
+	background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+	background-color: #000;
+	border-radius: 999px;
+}
+
+.hero-section-banner {
+	min-height: calc(100vh - 140px);
+	display: flex;
+	align-items: center;
+	justify-content: center;
 }
