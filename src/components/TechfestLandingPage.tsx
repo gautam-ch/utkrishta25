@@ -1,6 +1,110 @@
 import { useCallback, useEffect, useState, type FC } from 'react';
-import { motion, type Variants } from 'framer-motion';
+import { motion, type Variants, AnimatePresence } from 'framer-motion';
+import { Link } from 'react-router-dom';
 import LogoTeaserAnimation from './LogoTeaserAnimation';
+
+// Image Carousel Component
+const ImageCarousel: FC = () => {
+  const [currentIndex, setCurrentIndex] = useState(0);
+  
+  // Convert Google Drive links to direct image URLs
+  const images = [
+    '/pics/DSC_0015.JPG',
+    '/pics/DSC_0153.JPG',
+    '/pics/DSC_0451.JPG',
+    '/pics/DSC_1401.JPG',
+    '/pics/DSC_1433.JPG',
+    '/pics/DSC_2921.jpg',
+    '/pics/DSC_3102.jpg',
+    '/pics/DSC_3127.jpg',
+    '/pics/DSC_3294.jpg',
+    '/pics/DSC_3312.jpg',
+    '/pics/DSC_3373.jpg',
+    '/pics/DSC_3465.jpg',
+    '/pics/DSC_3472.jpg',
+  ];
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentIndex((prev) => (prev + 1) % images.length);
+    }, 4000);
+
+    return () => clearInterval(interval);
+  }, [images.length]);
+
+  const goToSlide = (index: number) => {
+    setCurrentIndex(index);
+  };
+
+  const goToPrevious = () => {
+    setCurrentIndex((prev) => (prev - 1 + images.length) % images.length);
+  };
+
+  const goToNext = () => {
+    setCurrentIndex((prev) => (prev + 1) % images.length);
+  };
+
+  return (
+    <div className="relative w-full overflow-hidden rounded-3xl border border-white/10 bg-white/5 backdrop-blur">
+      <div className="relative h-[400px] md:h-[500px]">
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={currentIndex}
+            initial={{ opacity: 0, x: 100 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -100 }}
+            transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+            className="absolute inset-0"
+          >
+            <img
+              src={images[currentIndex]}
+              alt={`UTKRISHTA Previous Year ${currentIndex + 1}`}
+              className="h-full w-full object-cover"
+              loading="lazy"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-950/20 to-transparent" />
+          </motion.div>
+        </AnimatePresence>
+
+        {/* Navigation Arrows */}
+        <button
+          onClick={goToPrevious}
+          className="absolute left-4 top-1/2 -translate-y-1/2 rounded-full border border-white/20 bg-white/10 p-3 text-white backdrop-blur transition-all hover:bg-white/20 hover:border-white/40"
+          aria-label="Previous image"
+        >
+          <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+          </svg>
+        </button>
+        <button
+          onClick={goToNext}
+          className="absolute right-4 top-1/2 -translate-y-1/2 rounded-full border border-white/20 bg-white/10 p-3 text-white backdrop-blur transition-all hover:bg-white/20 hover:border-white/40"
+          aria-label="Next image"
+        >
+          <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+          </svg>
+        </button>
+
+        {/* Dots Indicator */}
+        <div className="absolute bottom-6 left-1/2 flex -translate-x-1/2 gap-2">
+          {images.map((_, index) => (
+            <button
+              key={index}
+              onClick={() => goToSlide(index)}
+              className={`h-2 rounded-full transition-all ${
+                index === currentIndex
+                  ? 'w-8 bg-sky-400'
+                  : 'w-2 bg-white/30 hover:bg-white/50'
+              }`}
+              aria-label={`Go to slide ${index + 1}`}
+            />
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+};
 
 // Target timestamp aligns with 1 Nov 2025, 00:00 IST (UTC+5:30)
 const TARGET_EVENT_DATE = new Date('2025-10-31T18:30:00Z');
@@ -117,48 +221,79 @@ const heroCardVariants: Variants = {
 
 const events = [
   {
-    title: 'SYNC SUMMIT',
+    title: 'RECURSIA',
     description:
-      'A 24-hour collaborative hackathon where interdisciplinary squads prototype solutions for a hyper-connected campus of tomorrow.',
-    tags: ['Hackathon', 'AI', 'XR'],
-    schedule: 'March 15 • Innovation Arena',
+      'A collaborative hackathon where interdisciplinary teams prototype innovative solutions and showcase their coding prowess in a competitive environment.',
+    tags: ['Hackathon', 'Technical', 'Competition'],
+    schedule: 'Nov 1 • 3:30 PM • G04',
   },
   {
-    title: 'CO-LAB SHOWCASE',
+    title: 'NEURAL NEXUS',
     description:
-      'Immersive demos from student-founder duos, showcasing breakthroughs in robotics, bio-informatics, and climate-tech.',
-    tags: ['Demos', 'Startups'],
-    schedule: 'March 16 • Discovery Pavilion',
+      'An exciting technical event focused on AI and machine learning challenges that test your problem-solving skills and innovation.',
+    tags: ['AI/ML', 'Technical', 'Epoch'],
+    schedule: 'Nov 1 • Post-Inauguration • G04',
   },
   {
-    title: 'AMPLIFY KEYNOTES',
+    title: 'BATTLE OF BEATS AND VOICES',
     description:
-      'Visionary product leaders and alumni reveal how collaboration scales impact across industries.',
-    tags: ['Keynotes', 'Panels'],
-    schedule: 'March 17 • Main Stage',
+      'Showcase your musical and vocal talents in this thrilling competition where rhythm meets creativity. A platform for artists to shine.',
+    tags: ['Cultural', 'Music', 'Performance'],
+    schedule: 'Nov 1 • 5:45 PM • Reverb',
+  },
+  {
+    title: 'CHAKRAVYUH',
+    description:
+      'Navigate through complex technical and algorithmic challenges in this brain-teasing competition organized by GDG.',
+    tags: ['Technical', 'GDG', 'Competition'],
+    schedule: 'Nov 4 & 5 • 5:45 PM & 9:30 AM',
+  },
+  {
+    title: 'DATA X HUNTER',
+    description:
+      'Test your data science skills in this intensive competition where you analyze, visualize, and extract insights from complex datasets.',
+    tags: ['Data Science', 'Technical', 'Matrix'],
+    schedule: 'Nov 5 • 5:30 PM',
+  },
+  {
+    title: 'CINEMATIC ESSENCE',
+    description:
+      'Capture and present your photography and videography skills in this creative showcase organized by F-Stops.',
+    tags: ['Cultural', 'Photography', 'Creative'],
+    schedule: 'Nov 5 • 3:00 PM • Online',
   },
 ];
 
 const faqs = [
   {
-    question: 'Who can participate in UTKRISHTA 2025?',
+    question: 'When will UTKRISHTA be held?',
     answer:
-      'Students, researchers, and early-stage founders from IIIT Sri City and partner institutions. Cross-disciplinary teams are highly encouraged.',
+      'UTKRISHTA will take place from November 1st to November 7th.',
   },
   {
-    question: 'Do I need a team in advance?',
+    question: 'Does it include only technical events?',
     answer:
-      'No. Join our on-site team formation mixer or collaborate through the UTKRISHTA app to find your crew before the hack tracks begin.',
+      'No, UTKRISHTA features a diverse range of technical, cultural, and fun events, offering something for everyone.',
   },
   {
-    question: 'Is there a registration fee?',
+    question: 'What kind of fun events will be there?',
     answer:
-      'General access is complimentary. Premium passes for workshops and mentorship clinics will be available starting February 10.',
+      'Fun events include BGMI, Ludo King, Valorant, Gully Cricket, and several other engaging activities.',
   },
   {
-    question: 'Will sessions be streamed?',
+    question: 'Is there a limit to the number of events I can participate in?',
     answer:
-      'Keynotes and select finals will stream live for registered participants. Replays drop 48 hours after the fest concludes.',
+      'No, there is no limit — you can participate in as many events as you like.',
+  },
+  {
+    question: 'How can I register for the events?',
+    answer:
+      'Registrations will be done through the Campus Life App.',
+  },
+  {
+    question: 'Can students from other colleges participate?',
+    answer:
+      'Unfortunately, UTKRISHTA is exclusively for IIIT Sri City students.',
   },
 ];
 
@@ -172,6 +307,7 @@ const navLinks = [
 const TechfestLandingPage: FC = () => {
   const [timeLeft, setTimeLeft] = useState<TimeRemaining>(() => computeTimeRemaining());
   const [logoSequenceComplete, setLogoSequenceComplete] = useState(false);
+  const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(null);
 
   useEffect(() => {
     const intervalId = window.setInterval(() => {
@@ -200,6 +336,46 @@ const TechfestLandingPage: FC = () => {
 
   const handleLogoComplete = useCallback(() => {
     setLogoSequenceComplete(true);
+  }, []);
+
+  // Handle scrolling to section after logo animation completes (from schedule page)
+  useEffect(() => {
+    if (logoSequenceComplete) {
+      const scrollToSection = sessionStorage.getItem('scrollToSection');
+      if (scrollToSection) {
+        sessionStorage.removeItem('scrollToSection');
+        setTimeout(() => {
+          const element = document.querySelector(`#${scrollToSection}`);
+          if (element) {
+            const headerOffset = 80;
+            const elementPosition = element.getBoundingClientRect().top;
+            const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+            window.scrollTo({
+              top: offsetPosition,
+              behavior: 'smooth',
+            });
+          }
+        }, 300);
+      }
+    }
+  }, [logoSequenceComplete]);
+
+  const handleNavClick = useCallback((e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+    e.preventDefault();
+    if (href === '#home') {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
+    }
+    const element = document.querySelector(href);
+    if (element) {
+      const headerOffset = 80;
+      const elementPosition = element.getBoundingClientRect().top;
+      const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+      window.scrollTo({
+        top: offsetPosition,
+        behavior: 'smooth',
+      });
+    }
   }, []);
 
   const countdownItems = [
@@ -232,7 +408,8 @@ const TechfestLandingPage: FC = () => {
         <div className="mx-auto flex max-w-6xl items-center gap-6 px-6 py-4">
           <motion.a
             href="#home"
-            className="header-logo flex items-center gap-3"
+            onClick={(e) => handleNavClick(e, '#home')}
+            className="header-logo flex items-center gap-3 cursor-pointer"
             variants={headerItemVariants}
             initial="hidden"
             animate={animationState}
@@ -253,7 +430,8 @@ const TechfestLandingPage: FC = () => {
               <motion.a
                 key={link.label}
                 href={link.href}
-                className="transition-colors hover:text-white"
+                onClick={(e) => handleNavClick(e, link.href)}
+                className="transition-colors hover:text-white cursor-pointer"
                 variants={headerItemVariants}
               >
                 {link.label}
@@ -262,7 +440,8 @@ const TechfestLandingPage: FC = () => {
           </motion.nav>
           <motion.a
             href="#register"
-            className="register-button hidden rounded-full border border-sky-400/70 px-5 py-2 text-sm font-semibold uppercase tracking-[0.3em] text-sky-200 transition hover:border-sky-300 hover:text-white md:inline-flex"
+            onClick={(e) => handleNavClick(e, '#register')}
+            className="register-button hidden rounded-full border border-sky-400/70 px-5 py-2 text-sm font-semibold uppercase tracking-[0.3em] text-sky-200 transition hover:border-sky-300 hover:text-white cursor-pointer md:inline-flex"
             variants={headerItemVariants}
             initial="hidden"
             animate={animationState}
@@ -379,6 +558,22 @@ const TechfestLandingPage: FC = () => {
         </section>
 
         <motion.section
+          className="flex flex-col gap-8"
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.2 }}
+          variants={sectionVariants}
+        >
+          <div>
+            <h2 className="text-3xl font-semibold text-white md:text-4xl">Memories from Previous Years</h2>
+            <p className="mt-3 max-w-2xl text-slate-300">
+              Relive the magic of past UTKRISHTA festivals through these unforgettable moments.
+            </p>
+          </div>
+          <ImageCarousel />
+        </motion.section>
+
+        <motion.section
           id="about"
           className="grid gap-12 md:grid-cols-[1.2fr_1fr]"
           initial="hidden"
@@ -386,15 +581,15 @@ const TechfestLandingPage: FC = () => {
           viewport={{ once: true, amount: 0.3 }}
           variants={sectionVariants}
         >
-          <div>
+          <div className="mt-12">
             <h2 className="text-3xl font-semibold text-white md:text-4xl">Why Innovation Thrives Here</h2>
             <p className="mt-6 text-slate-300">
-              UTKRISHTA is the annual techfest of IIIT Sri City, celebrating the collision of bold ideas and collaborative spirit. Across three immersive days, experience high-voltage hackathons, speculative design labs, deep-tech showcases, and fireside chats that unlock shared intelligence.
+            UTKRISHTA, the Techno-Cultural Festival of IIIT Sri City, is a celebration of innovation, creativity, and spirit. It serves as a vibrant platform where technology meets art, ideas meet execution, and students push the limits of imagination.
             </p>
             <p className="mt-4 text-slate-400">
-              From dawn-to-dusk maker zones to midnight strategy rituals, every encounter is engineered to spark partnerships that outlast the fest.
+            The festival embodies the institute's vision of empowering young minds to explore, create, and collaborate. With an exciting mix of technical, cultural, and entrepreneurial events, UTKRISHTA offers students the opportunity to showcase their skills, connect with peers, and gain transformative experiences. It's more than just a fest it's a movement that celebrates knowledge, creativity, and the unstoppable drive to achieve excellence.
             </p>
-            <div className="mt-8 grid gap-6 md:grid-cols-2">
+            <div className="mt-8 grid gap-6 md:grid-cols-2 mt-10">
               <div className="rounded-3xl border border-sky-400/30 bg-sky-400/10 p-5 text-sky-100">
                 <p className="text-sm uppercase tracking-[0.4em]">Collab Arenas</p>
                 <p className="mt-3 text-xl font-semibold">Domain mash-ups that accelerate moonshot thinking.</p>
@@ -405,16 +600,24 @@ const TechfestLandingPage: FC = () => {
               </div>
             </div>
           </div>
-          <div className="rounded-3xl border border-white/10 bg-linear-to-br from-slate-900 to-slate-950 p-8">
-            <h3 className="text-xl font-semibold text-white">Pulse of the Fest</h3>
-            <ul className="mt-5 space-y-4 text-sm text-slate-300">
-              <li>⚡ Lightning Labs every morning</li>
-              <li>🎛️ Collaboration Studio with realtime dashboards</li>
-              <li>🛰️ Student ventures pitching to micro-funds</li>
-              <li>🎶 Sundown synthwave social + creator lounge</li>
-            </ul>
-            <div className="mt-8 rounded-2xl border border-white/10 bg-slate-800/40 p-4 text-xs uppercase tracking-[0.35em] text-slate-300">
-              Curated by the UTKRISHTA student council with support from IIIT Sri City innovation partners.
+          <div className="flex flex-col gap-6">
+            <div id="about-college" className="rounded-3xl border border-white/10 bg-white/5 p-8 text-slate-200 backdrop-blur">
+              <h2 className="text-2xl font-semibold text-white md:text-3xl">About IIIT Sri City</h2>
+              <p className="mt-4 text-base leading-relaxed text-slate-300">
+                Indian Institute of Information Technology Sri City (IIITS), Chittoor, established in 2013 by the Government of India, is an Institute of National Importance created under the Public-Private Partnership (PPP) model. The institute is a collaborative venture between the Government of India, the Government of Andhra Pradesh, and Sri City Pvt. Ltd.
+              </p>
+            </div>
+            <div className="rounded-3xl border border-white/10 bg-linear-to-br from-slate-900 to-slate-950 p-6">
+              <h3 className="text-xl font-semibold text-white">Pulse of the Fest</h3>
+              <ul className="mt-5 space-y-4 text-sm text-slate-300">
+                <li>⚡ Lightning Labs every morning</li>
+                <li>🎛️ Collaboration Studio with realtime dashboards</li>
+                <li>🛰️ Student ventures pitching to micro-funds</li>
+                <li>🎶 Sundown synthwave social + creator lounge</li>
+              </ul>
+              <div className="mt-8 rounded-2xl border border-white/10 bg-slate-800/40 p-4 text-xs uppercase tracking-[0.35em] text-slate-300">
+                Curated by the UTKRISHTA student council with support from IIIT Sri City innovation partners.
+              </div>
             </div>
           </div>
         </motion.section>
@@ -429,27 +632,28 @@ const TechfestLandingPage: FC = () => {
         >
           <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
             <div>
-              <h2 className="text-3xl font-semibold text-white md:text-4xl">Three Days. Infinite Collaboration.</h2>
+              <h2 className="text-3xl font-semibold text-white md:text-4xl">Seven Days. Infinite Collaboration.</h2>
               <p className="mt-3 max-w-2xl text-slate-300">
-                Anchor into curated tracks that pair technologists, artists, strategists, and makers. Earn collab badges, unlock mentorship nodes, and ship your boldest prototype yet.
+                Experience a week-long celebration of innovation, creativity, and talent. From technical hackathons to cultural performances, gaming tournaments to sports competitions - UTKRISHTA offers something for everyone.
               </p>
             </div>
-            <a
-              href="#register"
-              className="inline-flex items-center gap-2 text-xs uppercase tracking-[0.45em] text-sky-200 hover:text-white"
+            <Link
+              to="/schedule"
+              className="group relative inline-flex items-center gap-2 rounded-full border border-sky-400/50 bg-sky-400/10 px-6 py-3 text-xs uppercase tracking-[0.45em] text-sky-200 shadow-lg shadow-sky-400/30 transition-all hover:border-sky-300 hover:bg-sky-400/20 hover:text-white hover:shadow-xl hover:shadow-sky-400/50"
             >
-              View Schedule →
-            </a>
+              <span className="absolute inset-0 rounded-full bg-sky-400/20 blur-xl transition-opacity group-hover:opacity-75"></span>
+              <span className="relative">View Schedule →</span>
+            </Link>
           </div>
 
-          <div className="grid gap-8 md:grid-cols-3">
+          <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
             {events.map((event) => (
               <div
                 key={event.title}
                 className="flex h-full flex-col justify-between rounded-3xl border border-white/10 bg-white/5 p-6 backdrop-blur"
               >
                 <div>
-                  <span className="text-xs uppercase tracking-[0.45em] text-sky-300">Featured Track</span>
+                  <span className="text-xs uppercase tracking-[0.45em] text-sky-300">Featured Event</span>
                   <h3 className="mt-4 text-2xl font-semibold text-white">{event.title}</h3>
                   <p className="mt-3 text-sm text-slate-300">{event.description}</p>
                 </div>
@@ -520,12 +724,49 @@ const TechfestLandingPage: FC = () => {
             </p>
           </div>
           <div className="grid gap-6 md:grid-cols-2">
-            {faqs.map((faq) => (
-              <div key={faq.question} className="rounded-3xl border border-white/10 bg-white/5 p-6 text-sm text-slate-200 backdrop-blur">
-                <p className="text-xs uppercase tracking-[0.4em] text-slate-400">{faq.question}</p>
-                <p className="mt-3 text-sm text-slate-200">{faq.answer}</p>
-              </div>
-            ))}
+            {faqs.map((faq, index) => {
+              const isOpen = openFaqIndex === index;
+              return (
+                <div
+                  key={faq.question}
+                  className="rounded-3xl border border-white/10 bg-white/5 p-6 text-sm text-slate-200 backdrop-blur"
+                >
+                  <button
+                    onClick={() => setOpenFaqIndex(isOpen ? null : index)}
+                    className="flex w-full items-start justify-between gap-4 text-left"
+                  >
+                    <p className="text-xs uppercase tracking-[0.4em] text-slate-400">{faq.question}</p>
+                    <motion.div
+                      animate={{ rotate: isOpen ? 180 : 0 }}
+                      transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+                      className="shrink-0"
+                    >
+                      <svg
+                        className="h-5 w-5 text-sky-400"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </motion.div>
+                  </button>
+                  <AnimatePresence initial={false}>
+                    {isOpen && (
+                      <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: 'auto', opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+                        className="overflow-hidden"
+                      >
+                        <p className="mt-3 text-sm text-slate-200">{faq.answer}</p>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+              );
+            })}
           </div>
         </motion.section>
       </main>
