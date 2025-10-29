@@ -1,5 +1,6 @@
-import { useEffect, useCallback } from 'react';
-import { motion, type Variants } from 'framer-motion';
+import React, { useEffect, useCallback, useState } from 'react';
+import { createPortal } from 'react-dom';
+import { motion, type Variants, AnimatePresence } from 'framer-motion';
 import { Link, useNavigate } from 'react-router-dom';
 
 const sectionVariants: Variants = {
@@ -296,6 +297,7 @@ const eventDetails: EventDetail[] = [
 
 const SchedulePage = () => {
   const navigate = useNavigate();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -330,24 +332,27 @@ const SchedulePage = () => {
       />
 
       <motion.header
-        className="sticky top-0 z-30 border-b border-white/5 bg-slate-950/75 backdrop-blur-sm"
+        className="sticky top-0 z-50 border-b border-white/5 bg-slate-950/75 backdrop-blur-sm"
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.7 }}
       >
-        <div className="mx-auto flex max-w-6xl items-center gap-6 px-6 py-4">
+        <div className="mx-auto flex max-w-6xl items-center gap-4 px-4 sm:px-6 py-3 sm:py-4">
           <Link
             to="/"
-            onClick={(e) => handleNavClick(e, '/')}
-            className="flex items-center gap-3 cursor-pointer"
+            onClick={(e) => {
+              handleNavClick(e, '/');
+              setMobileMenuOpen(false);
+            }}
+            className="flex items-center gap-2 sm:gap-3 cursor-pointer"
           >
             <img
               src="/uk25.png"
               alt="UTKRISHTA 2025 logo"
-              className="h-12 w-auto drop-shadow-[0_0_18px_rgba(56,189,248,0.35)]"
+              className="h-8 sm:h-10 md:h-12 w-auto drop-shadow-[0_0_18px_rgba(56,189,248,0.35)]"
             />
           </Link>
-          <nav className="ml-auto hidden items-center gap-8 text-sm font-medium uppercase tracking-[0.3em] text-slate-300 md:flex">
+          <nav className="ml-auto hidden items-center gap-6 lg:gap-8 text-sm font-medium uppercase tracking-[0.3em] text-slate-300 md:flex">
             <Link
               to="/"
               onClick={(e) => handleNavClick(e, '/')}
@@ -377,10 +382,120 @@ const SchedulePage = () => {
               FAQs
             </Link>
           </nav>
+          
+          {/* Hamburger Menu Button */}
+          <button
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            className="md:hidden flex flex-col gap-1.5 p-2 cursor-pointer focus:outline-none focus:ring-2 focus:ring-sky-400 rounded-lg"
+            aria-label="Toggle menu"
+            aria-expanded={mobileMenuOpen}
+          >
+            <motion.span
+              className="block h-0.5 w-6 bg-slate-300 rounded"
+              animate={{
+                rotate: mobileMenuOpen ? 45 : 0,
+                y: mobileMenuOpen ? 8 : 0,
+              }}
+              transition={{ duration: 0.3 }}
+            />
+            <motion.span
+              className="block h-0.5 w-6 bg-slate-300 rounded"
+              animate={{ opacity: mobileMenuOpen ? 0 : 1 }}
+              transition={{ duration: 0.3 }}
+            />
+            <motion.span
+              className="block h-0.5 w-6 bg-slate-300 rounded"
+              animate={{
+                rotate: mobileMenuOpen ? -45 : 0,
+                y: mobileMenuOpen ? -8 : 0,
+              }}
+              transition={{ duration: 0.3 }}
+            />
+          </button>
         </div>
       </motion.header>
 
-      <main className="mx-auto flex w-full max-w-6xl flex-col gap-28 px-6 py-20">
+      {/* Mobile Menu - Rendered via Portal to ensure proper z-index */}
+      {typeof window !== 'undefined' && createPortal(
+        <AnimatePresence mode="wait">
+          {mobileMenuOpen && (
+            <>
+              <motion.div
+                className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-[9998] md:hidden"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                onClick={() => setMobileMenuOpen(false)}
+              />
+              <motion.div
+                className="fixed top-[73px] right-0 bottom-0 w-[280px] sm:w-[320px] bg-slate-950 border-l border-white/10 z-[9999] md:hidden"
+                initial={{ x: '100%' }}
+                animate={{ x: 0 }}
+                exit={{ x: '100%' }}
+                transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+              >
+                <nav className="flex flex-col gap-1 p-6 h-full overflow-y-auto">
+                  <motion.a
+                    href="/"
+                    onClick={(e) => {
+                      handleNavClick(e, '/');
+                      setMobileMenuOpen(false);
+                    }}
+                    className="px-4 py-3 text-sm font-medium uppercase tracking-[0.3em] text-slate-300 rounded-lg transition-colors hover:bg-white/5 hover:text-white cursor-pointer whitespace-nowrap"
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0 }}
+                  >
+                    Home
+                  </motion.a>
+                  <motion.a
+                    href="/#about"
+                    onClick={(e) => {
+                      handleNavClick(e, '/#about');
+                      setMobileMenuOpen(false);
+                    }}
+                    className="px-4 py-3 text-sm font-medium uppercase tracking-[0.3em] text-slate-300 rounded-lg transition-colors hover:bg-white/5 hover:text-white cursor-pointer whitespace-nowrap"
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.1 }}
+                  >
+                    About
+                  </motion.a>
+                  <motion.a
+                    href="/#events"
+                    onClick={(e) => {
+                      handleNavClick(e, '/#events');
+                      setMobileMenuOpen(false);
+                    }}
+                    className="px-4 py-3 text-sm font-medium uppercase tracking-[0.3em] text-slate-300 rounded-lg transition-colors hover:bg-white/5 hover:text-white cursor-pointer whitespace-nowrap"
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.2 }}
+                  >
+                    Events
+                  </motion.a>
+                  <motion.a
+                    href="/#faqs"
+                    onClick={(e) => {
+                      handleNavClick(e, '/#faqs');
+                      setMobileMenuOpen(false);
+                    }}
+                    className="px-4 py-3 text-sm font-medium uppercase tracking-[0.3em] text-slate-300 rounded-lg transition-colors hover:bg-white/5 hover:text-white cursor-pointer whitespace-nowrap"
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.3 }}
+                  >
+                    FAQs
+                  </motion.a>
+                </nav>
+              </motion.div>
+            </>
+          )}
+        </AnimatePresence>,
+        document.body
+      )}
+
+      <main className="mx-auto flex w-full max-w-6xl flex-col gap-16 sm:gap-20 md:gap-24 lg:gap-28 px-4 sm:px-6 py-12 sm:py-16 md:py-20">
         <motion.section
           className="flex flex-col gap-8"
           initial="hidden"
@@ -388,8 +503,8 @@ const SchedulePage = () => {
           variants={sectionVariants}
         >
           <div>
-            <h1 className="text-4xl font-semibold text-white md:text-5xl">Event Schedule</h1>
-            <p className="mt-3 max-w-2xl text-slate-300">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-semibold text-white">Event Schedule</h1>
+            <p className="mt-2 sm:mt-3 max-w-2xl text-sm sm:text-base text-slate-300">
               Complete details of all events happening during UTKRISHTA 2025.
             </p>
           </div>
@@ -405,7 +520,7 @@ const SchedulePage = () => {
             </motion.div>
           ) : (
             <motion.div
-              className="grid gap-8 md:grid-cols-2"
+              className="grid gap-6 sm:gap-7 md:gap-8 md:grid-cols-2"
               variants={containerVariants}
               initial="hidden"
               animate="visible"
@@ -413,49 +528,49 @@ const SchedulePage = () => {
               {eventDetails.map((event, index) => (
                 <motion.div
                   key={event.title}
-                  className="rounded-3xl border border-white/10 bg-white/5 p-8 backdrop-blur transition-transform hover:scale-[1.02] hover:border-white/20"
+                  className="rounded-2xl sm:rounded-3xl border border-white/10 bg-white/5 p-5 sm:p-6 md:p-8 backdrop-blur transition-transform hover:scale-[1.02] hover:border-white/20"
                   variants={cardVariants}
                   whileHover={{ 
                     y: -4,
                     transition: { duration: 0.2 }
                   }}
                 >
-                  <div className="mb-6">
-                    <span className="text-xs uppercase tracking-[0.45em] text-sky-300">Event {index + 1}</span>
-                    <h2 className="mt-4 text-3xl font-semibold text-white">{event.title}</h2>
-                    <p className="mt-3 text-slate-300">{event.description}</p>
+                  <div className="mb-4 sm:mb-5 md:mb-6">
+                    <span className="text-[0.65rem] sm:text-xs uppercase tracking-[0.35em] sm:tracking-[0.45em] text-sky-300">Event {index + 1}</span>
+                    <h2 className="mt-3 sm:mt-4 text-xl sm:text-2xl md:text-3xl font-semibold text-white">{event.title}</h2>
+                    <p className="mt-2 sm:mt-3 text-sm sm:text-base text-slate-300">{event.description}</p>
                   </div>
 
                   {event.fullDescription && (
-                    <div className="mt-6">
-                      <h3 className="text-lg font-semibold text-white">About the Event</h3>
-                      <p className="mt-2 text-slate-300 leading-relaxed">{event.fullDescription}</p>
+                    <div className="mt-4 sm:mt-5 md:mt-6">
+                      <h3 className="text-base sm:text-lg font-semibold text-white">About the Event</h3>
+                      <p className="mt-2 text-sm sm:text-base text-slate-300 leading-relaxed">{event.fullDescription}</p>
                     </div>
                   )}
 
-                  <div className="mt-6 grid gap-6 md:grid-cols-2">
+                  <div className="mt-4 sm:mt-5 md:mt-6 grid gap-4 sm:gap-5 md:gap-6 md:grid-cols-2">
                     {event.date && (
-                      <div className="rounded-2xl border border-sky-400/30 bg-sky-400/10 p-4">
-                        <p className="text-xs uppercase tracking-[0.4em] text-sky-200">Date & Time</p>
-                        <p className="mt-2 text-sm text-sky-100 whitespace-pre-line">{event.date}</p>
+                      <div className="rounded-xl sm:rounded-2xl border border-sky-400/30 bg-sky-400/10 p-3 sm:p-4">
+                        <p className="text-[0.65rem] sm:text-xs uppercase tracking-[0.3em] sm:tracking-[0.4em] text-sky-200">Date & Time</p>
+                        <p className="mt-1 sm:mt-2 text-xs sm:text-sm text-sky-100 whitespace-pre-line">{event.date}</p>
                       </div>
                     )}
                     {event.venue && (
-                      <div className="rounded-2xl border border-indigo-400/30 bg-indigo-400/10 p-4">
-                        <p className="text-xs uppercase tracking-[0.4em] text-indigo-200">Venue</p>
-                        <p className="mt-2 text-sm text-indigo-100">{event.venue}</p>
+                      <div className="rounded-xl sm:rounded-2xl border border-indigo-400/30 bg-indigo-400/10 p-3 sm:p-4">
+                        <p className="text-[0.65rem] sm:text-xs uppercase tracking-[0.3em] sm:tracking-[0.4em] text-indigo-200">Venue</p>
+                        <p className="mt-1 sm:mt-2 text-xs sm:text-sm text-indigo-100">{event.venue}</p>
                       </div>
                     )}
                   </div>
 
                   {event.tags.length > 0 && (
-                    <div className="mt-6">
-                      <p className="mb-3 text-xs uppercase tracking-[0.4em] text-slate-400">Categories</p>
-                      <div className="flex flex-wrap gap-2">
+                    <div className="mt-4 sm:mt-5 md:mt-6">
+                      <p className="mb-2 sm:mb-3 text-[0.65rem] sm:text-xs uppercase tracking-[0.3em] sm:tracking-[0.4em] text-slate-400">Categories</p>
+                      <div className="flex flex-wrap gap-1.5 sm:gap-2">
                         {event.tags.map((tag) => (
                           <span
                             key={tag}
-                            className="rounded-full bg-white/10 px-3 py-1 text-[0.65rem] text-sky-200"
+                            className="rounded-full bg-white/10 px-2.5 sm:px-3 py-1 text-[0.6rem] sm:text-[0.65rem] text-sky-200"
                           >
                             {tag}
                           </span>
@@ -498,8 +613,8 @@ const SchedulePage = () => {
         </motion.section>
       </main>
 
-      <footer className="border-t border-white/5 bg-slate-950/80 py-10">
-        <div className="mx-auto flex max-w-6xl flex-col gap-6 px-6 text-xs uppercase tracking-[0.4em] text-slate-500 md:flex-row md:items-center md:justify-between">
+      <footer className="border-t border-white/5 bg-slate-950/80 py-6 sm:py-8 md:py-10">
+        <div className="mx-auto flex max-w-6xl flex-col gap-4 sm:gap-5 md:gap-6 px-4 sm:px-6 text-xs uppercase tracking-[0.4em] text-slate-500 md:flex-row md:items-center md:justify-between">
           <span>© {new Date().getFullYear()} UTKRISHTA · IIIT Sri City</span>
           <div className="flex flex-wrap gap-4">
             <Link to="/#register" className="hover:text-sky-200">

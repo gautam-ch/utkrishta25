@@ -1,4 +1,5 @@
-import { useCallback, useEffect, useState, type FC } from 'react';
+import React, { useCallback, useEffect, useState, type FC } from 'react';
+import { createPortal } from 'react-dom';
 import { motion, type Variants, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import LogoTeaserAnimation from './LogoTeaserAnimation';
@@ -45,8 +46,8 @@ const ImageCarousel: FC = () => {
   };
 
   return (
-    <div className="relative w-full overflow-hidden rounded-3xl border border-white/10 bg-white/5 backdrop-blur">
-      <div className="relative h-[400px] md:h-[500px]">
+    <div className="relative w-full overflow-hidden rounded-2xl sm:rounded-3xl border border-white/10 bg-white/5 backdrop-blur">
+      <div className="relative h-[250px] sm:h-[350px] md:h-[400px] lg:h-[500px]">
         <AnimatePresence mode="wait">
           <motion.div
             key={currentIndex}
@@ -69,19 +70,19 @@ const ImageCarousel: FC = () => {
         {/* Navigation Arrows */}
         <button
           onClick={goToPrevious}
-          className="absolute left-4 top-1/2 -translate-y-1/2 rounded-full border border-white/20 bg-white/10 p-3 text-white backdrop-blur transition-all hover:bg-white/20 hover:border-white/40"
+          className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 rounded-full border border-white/20 bg-white/10 p-2 sm:p-3 text-white backdrop-blur transition-all hover:bg-white/20 hover:border-white/40"
           aria-label="Previous image"
         >
-          <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <svg className="h-4 w-4 sm:h-5 sm:w-5 md:h-6 md:w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
           </svg>
         </button>
         <button
           onClick={goToNext}
-          className="absolute right-4 top-1/2 -translate-y-1/2 rounded-full border border-white/20 bg-white/10 p-3 text-white backdrop-blur transition-all hover:bg-white/20 hover:border-white/40"
+          className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 rounded-full border border-white/20 bg-white/10 p-2 sm:p-3 text-white backdrop-blur transition-all hover:bg-white/20 hover:border-white/40"
           aria-label="Next image"
         >
-          <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <svg className="h-4 w-4 sm:h-5 sm:w-5 md:h-6 md:w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
           </svg>
         </button>
@@ -308,6 +309,7 @@ const TechfestLandingPage: FC = () => {
   const [timeLeft, setTimeLeft] = useState<TimeRemaining>(() => computeTimeRemaining());
   const [logoSequenceComplete, setLogoSequenceComplete] = useState(false);
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(null);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     const intervalId = window.setInterval(() => {
@@ -400,16 +402,19 @@ const TechfestLandingPage: FC = () => {
       />
 
       <motion.header
-        className="app-header sticky top-0 z-30 border-b border-white/5 bg-slate-950/75 backdrop-blur-sm"
+        className="app-header sticky top-0 z-50 border-b border-white/5 bg-slate-950/75 backdrop-blur-sm"
         variants={headerContainerVariants}
         initial="hidden"
         animate={animationState}
       >
-        <div className="mx-auto flex max-w-6xl items-center gap-6 px-6 py-4">
+        <div className="mx-auto flex max-w-6xl items-center gap-4 px-4 sm:px-6 py-3 sm:py-4">
           <motion.a
             href="#home"
-            onClick={(e) => handleNavClick(e, '#home')}
-            className="header-logo flex items-center gap-3 cursor-pointer"
+            onClick={(e) => {
+              handleNavClick(e, '#home');
+              setMobileMenuOpen(false);
+            }}
+            className="header-logo flex items-center gap-2 sm:gap-3 cursor-pointer"
             variants={headerItemVariants}
             initial="hidden"
             animate={animationState}
@@ -417,11 +422,11 @@ const TechfestLandingPage: FC = () => {
             <img
               src="/uk25.png"
               alt="UTKRISHTA 2025 logo"
-              className="h-12 w-auto drop-shadow-[0_0_18px_rgba(56,189,248,0.35)]"
+              className="h-8 sm:h-10 md:h-12 w-auto drop-shadow-[0_0_18px_rgba(56,189,248,0.35)]"
             />
           </motion.a>
           <motion.nav
-            className="nav-links ml-auto hidden items-center gap-8 text-sm font-medium uppercase tracking-[0.3em] text-slate-300 md:flex"
+            className="nav-links ml-auto hidden items-center gap-6 lg:gap-8 text-sm font-medium uppercase tracking-[0.3em] text-slate-300 md:flex"
             variants={headerNavVariants}
             initial="hidden"
             animate={animationState}
@@ -441,18 +446,105 @@ const TechfestLandingPage: FC = () => {
           <motion.a
             href="#register"
             onClick={(e) => handleNavClick(e, '#register')}
-            className="register-button hidden rounded-full border border-sky-400/70 px-5 py-2 text-sm font-semibold uppercase tracking-[0.3em] text-sky-200 transition hover:border-sky-300 hover:text-white cursor-pointer md:inline-flex"
+            className="register-button hidden rounded-full border border-sky-400/70 px-4 lg:px-5 py-2 text-xs sm:text-sm font-semibold uppercase tracking-[0.3em] text-sky-200 transition hover:border-sky-300 hover:text-white cursor-pointer md:inline-flex"
             variants={headerItemVariants}
             initial="hidden"
             animate={animationState}
           >
             Register
           </motion.a>
+          
+          {/* Hamburger Menu Button */}
+          <button
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            className="md:hidden flex flex-col gap-1.5 p-2 cursor-pointer focus:outline-none focus:ring-2 focus:ring-sky-400 rounded-lg"
+            aria-label="Toggle menu"
+            aria-expanded={mobileMenuOpen}
+          >
+            <motion.span
+              className="block h-0.5 w-6 bg-slate-300 rounded"
+              animate={{
+                rotate: mobileMenuOpen ? 45 : 0,
+                y: mobileMenuOpen ? 8 : 0,
+              }}
+              transition={{ duration: 0.3 }}
+            />
+            <motion.span
+              className="block h-0.5 w-6 bg-slate-300 rounded"
+              animate={{ opacity: mobileMenuOpen ? 0 : 1 }}
+              transition={{ duration: 0.3 }}
+            />
+            <motion.span
+              className="block h-0.5 w-6 bg-slate-300 rounded"
+              animate={{
+                rotate: mobileMenuOpen ? -45 : 0,
+                y: mobileMenuOpen ? -8 : 0,
+              }}
+              transition={{ duration: 0.3 }}
+            />
+          </button>
         </div>
       </motion.header>
 
-      <main className="mx-auto flex w-full max-w-6xl flex-col gap-28 px-6 py-20">
-        <section id="home" className="hero-section-banner relative flex min-h-[80vh] flex-col items-center justify-center gap-12 overflow-hidden">
+      {/* Mobile Menu - Rendered via Portal to ensure proper z-index */}
+      {typeof window !== 'undefined' && createPortal(
+        <AnimatePresence mode="wait">
+          {mobileMenuOpen && (
+            <>
+              <motion.div
+                className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-[9998] md:hidden"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                onClick={() => setMobileMenuOpen(false)}
+              />
+              <motion.div
+                className="fixed top-[73px] right-0 bottom-0 w-[280px] sm:w-[320px] bg-slate-950 border-l border-white/10 z-[9999] md:hidden"
+                initial={{ x: '100%' }}
+                animate={{ x: 0 }}
+                exit={{ x: '100%' }}
+                transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+              >
+                <nav className="flex flex-col gap-1 p-6 h-full overflow-y-auto">
+                  {navLinks.map((link, index) => (
+                    <motion.a
+                      key={link.label}
+                      href={link.href}
+                      onClick={(e) => {
+                        handleNavClick(e, link.href);
+                        setMobileMenuOpen(false);
+                      }}
+                      className="px-4 py-3 text-sm font-medium uppercase tracking-[0.3em] text-slate-300 rounded-lg transition-colors hover:bg-white/5 hover:text-white cursor-pointer whitespace-nowrap"
+                      initial={{ opacity: 0, x: 20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: index * 0.1 }}
+                    >
+                      {link.label}
+                    </motion.a>
+                  ))}
+                  <motion.a
+                    href="#register"
+                    onClick={(e) => {
+                      handleNavClick(e, '#register');
+                      setMobileMenuOpen(false);
+                    }}
+                    className="mt-4 px-4 py-3 text-sm font-semibold uppercase tracking-[0.3em] text-sky-200 border border-sky-400/70 rounded-lg text-center transition hover:border-sky-300 hover:text-white hover:bg-sky-400/10 cursor-pointer whitespace-nowrap"
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: navLinks.length * 0.1 }}
+                  >
+                    Register
+                  </motion.a>
+                </nav>
+              </motion.div>
+            </>
+          )}
+        </AnimatePresence>,
+        document.body
+      )}
+
+      <main className="mx-auto flex w-full max-w-6xl flex-col gap-16 sm:gap-20 md:gap-24 lg:gap-28 px-4 sm:px-6 py-12 sm:py-16 md:py-20">
+        <section id="home" className="hero-section-banner relative flex min-h-[80vh] flex-col items-center justify-center gap-8 sm:gap-10 md:gap-12 overflow-hidden">
           <div
             className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_center,rgba(59,130,246,0.16),transparent_70%)]"
             aria-hidden="true"
@@ -488,13 +580,13 @@ const TechfestLandingPage: FC = () => {
                 <span>annual techno fest</span>
               </motion.div>
               <motion.h1
-                className="hero-main-heading text-4xl font-semibold leading-tight text-white md:text-6xl"
+                className="hero-main-heading text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-semibold leading-tight text-white px-2 sm:px-0"
                 variants={heroHeadingVariants}
               >
                 Innovation Through Collaboration
               </motion.h1>
               <motion.p
-                className="mt-6 text-lg text-slate-300 md:text-xl"
+                className="mt-4 sm:mt-5 md:mt-6 text-base sm:text-lg md:text-xl text-slate-300 px-2 sm:px-0"
                 variants={heroParagraphVariants}
               >
                 A cinematic tech carnival where coders, designers, storytellers, and makers co-create the next wave of human-centered innovation.
@@ -509,7 +601,7 @@ const TechfestLandingPage: FC = () => {
                     <span>THE COUNTDOWN IS FINAL. BE READY.</span>
                     <span className="text-sky-100">Nov 01</span>
                   </div>
-                  <div className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-4">
+                  <div className="mt-4 sm:mt-6 grid grid-cols-2 gap-2 sm:gap-3 md:gap-4 sm:grid-cols-4">
                     {countdownItems.map((item) => (
                       <div
                         key={item.label}
@@ -519,8 +611,8 @@ const TechfestLandingPage: FC = () => {
                           className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(56,189,248,0.25),transparent_70%)]"
                           aria-hidden="true"
                         />
-                        <span className="relative z-10 text-[0.65rem] uppercase tracking-[0.6em] text-sky-300">{item.label}</span>
-                        <span className="relative z-10 mt-2 block text-3xl font-semibold text-white md:text-4xl">
+                        <span className="relative z-10 text-[0.55rem] sm:text-[0.6rem] md:text-[0.65rem] uppercase tracking-[0.4em] sm:tracking-[0.5em] md:tracking-[0.6em] text-sky-300">{item.label}</span>
+                        <span className="relative z-10 mt-1 sm:mt-2 block text-xl sm:text-2xl md:text-3xl lg:text-4xl font-semibold text-white">
                           {item.value.toString().padStart(item.pad, '0')}
                         </span>
                       </div>
@@ -537,7 +629,7 @@ const TechfestLandingPage: FC = () => {
           </div>
 
           <motion.div
-            className="grid gap-6 md:grid-cols-3"
+            className="grid gap-4 sm:gap-5 md:gap-6 md:grid-cols-3"
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true, amount: 0.4 }}
@@ -547,11 +639,11 @@ const TechfestLandingPage: FC = () => {
             {["5K+ Innovators", "48 Hrs of Creation", "70+ Mentors"].map((stat, index) => (
               <motion.div
                 key={stat}
-                className="rounded-3xl border border-white/10 bg-white/5 p-6 backdrop-blur"
+                className="rounded-2xl sm:rounded-3xl border border-white/10 bg-white/5 p-4 sm:p-5 md:p-6 backdrop-blur"
                 variants={sectionVariants}
               >
-                <p className="text-sm uppercase tracking-[0.4em] text-slate-400">Highlight 0{index + 1}</p>
-                <p className="mt-4 text-2xl font-semibold text-white">{stat}</p>
+                <p className="text-xs sm:text-sm uppercase tracking-[0.3em] sm:tracking-[0.4em] text-slate-400">Highlight 0{index + 1}</p>
+                <p className="mt-3 sm:mt-4 text-xl sm:text-2xl font-semibold text-white">{stat}</p>
               </motion.div>
             ))}
           </motion.div>
@@ -565,8 +657,8 @@ const TechfestLandingPage: FC = () => {
           variants={sectionVariants}
         >
           <div>
-            <h2 className="text-3xl font-semibold text-white md:text-4xl">Memories from Previous Years</h2>
-            <p className="mt-3 max-w-2xl text-slate-300">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-semibold text-white">Memories from Previous Years</h2>
+            <p className="mt-2 sm:mt-3 max-w-2xl text-sm sm:text-base text-slate-300">
               Relive the magic of past UTKRISHTA festivals through these unforgettable moments.
             </p>
           </div>
@@ -581,15 +673,15 @@ const TechfestLandingPage: FC = () => {
           viewport={{ once: true, amount: 0.3 }}
           variants={sectionVariants}
         >
-          <div className="mt-12">
-            <h2 className="text-3xl font-semibold text-white md:text-4xl">Why Innovation Thrives Here</h2>
-            <p className="mt-6 text-slate-300">
+          <div className="mt-8 md:mt-12">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-semibold text-white">Why Innovation Thrives Here</h2>
+            <p className="mt-4 sm:mt-5 md:mt-6 text-sm sm:text-base text-slate-300">
             UTKRISHTA, the Techno-Cultural Festival of IIIT Sri City, is a celebration of innovation, creativity, and spirit. It serves as a vibrant platform where technology meets art, ideas meet execution, and students push the limits of imagination.
             </p>
-            <p className="mt-4 text-slate-400">
+            <p className="mt-3 sm:mt-4 text-sm sm:text-base text-slate-400">
             The festival embodies the institute's vision of empowering young minds to explore, create, and collaborate. With an exciting mix of technical, cultural, and entrepreneurial events, UTKRISHTA offers students the opportunity to showcase their skills, connect with peers, and gain transformative experiences. It's more than just a fest it's a movement that celebrates knowledge, creativity, and the unstoppable drive to achieve excellence.
             </p>
-            <div className="mt-8 grid gap-6 md:grid-cols-2 mt-10">
+            <div className="mt-6 sm:mt-8 md:mt-10 grid gap-4 sm:gap-5 md:gap-6 md:grid-cols-2">
               <div className="rounded-3xl border border-sky-400/30 bg-sky-400/10 p-5 text-sky-100">
                 <p className="text-sm uppercase tracking-[0.4em]">Collab Arenas</p>
                 <p className="mt-3 text-xl font-semibold">Domain mash-ups that accelerate moonshot thinking.</p>
@@ -600,10 +692,10 @@ const TechfestLandingPage: FC = () => {
               </div>
             </div>
           </div>
-          <div className="flex flex-col gap-6">
-            <div id="about-college" className="rounded-3xl border border-white/10 bg-white/5 p-8 text-slate-200 backdrop-blur">
-              <h2 className="text-2xl font-semibold text-white md:text-3xl">About IIIT Sri City</h2>
-              <p className="mt-4 text-base leading-relaxed text-slate-300">
+          <div className="flex flex-col gap-4 sm:gap-5 md:gap-6">
+            <div id="about-college" className="rounded-2xl sm:rounded-3xl border border-white/10 bg-white/5 p-5 sm:p-6 md:p-8 text-slate-200 backdrop-blur">
+              <h2 className="text-xl sm:text-2xl md:text-3xl font-semibold text-white">About IIIT Sri City</h2>
+              <p className="mt-3 sm:mt-4 text-sm sm:text-base leading-relaxed text-slate-300">
                 Indian Institute of Information Technology Sri City (IIITS), Chittoor, established in 2013 by the Government of India, is an Institute of National Importance created under the Public-Private Partnership (PPP) model. The institute is a collaborative venture between the Government of India, the Government of Andhra Pradesh, and Sri City Pvt. Ltd.
               </p>
             </div>
@@ -630,10 +722,10 @@ const TechfestLandingPage: FC = () => {
           viewport={{ once: true, amount: 0.2 }}
           variants={sectionVariants}
         >
-          <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+          <div className="flex flex-col gap-4 sm:gap-5 md:flex-row md:items-end md:justify-between">
             <div>
-              <h2 className="text-3xl font-semibold text-white md:text-4xl">Seven Days. Infinite Collaboration.</h2>
-              <p className="mt-3 max-w-2xl text-slate-300">
+              <h2 className="text-2xl sm:text-3xl md:text-4xl font-semibold text-white">Seven Days. Infinite Collaboration.</h2>
+              <p className="mt-2 sm:mt-3 max-w-2xl text-sm sm:text-base text-slate-300">
                 Experience a week-long celebration of innovation, creativity, and talent. From technical hackathons to cultural performances, gaming tournaments to sports competitions - UTKRISHTA offers something for everyone.
               </p>
             </div>
@@ -646,26 +738,26 @@ const TechfestLandingPage: FC = () => {
             </Link>
           </div>
 
-          <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-5 sm:gap-6 md:gap-8 md:grid-cols-2 lg:grid-cols-3">
             {events.map((event) => (
               <div
                 key={event.title}
-                className="flex h-full flex-col justify-between rounded-3xl border border-white/10 bg-white/5 p-6 backdrop-blur"
+                className="flex h-full flex-col justify-between rounded-2xl sm:rounded-3xl border border-white/10 bg-white/5 p-4 sm:p-5 md:p-6 backdrop-blur"
               >
                 <div>
-                  <span className="text-xs uppercase tracking-[0.45em] text-sky-300">Featured Event</span>
-                  <h3 className="mt-4 text-2xl font-semibold text-white">{event.title}</h3>
-                  <p className="mt-3 text-sm text-slate-300">{event.description}</p>
+                  <span className="text-[0.65rem] sm:text-xs uppercase tracking-[0.35em] sm:tracking-[0.45em] text-sky-300">Featured Event</span>
+                  <h3 className="mt-3 sm:mt-4 text-xl sm:text-2xl font-semibold text-white">{event.title}</h3>
+                  <p className="mt-2 sm:mt-3 text-xs sm:text-sm text-slate-300">{event.description}</p>
                 </div>
-                <div className="mt-6 space-y-3 text-xs uppercase tracking-[0.4em] text-slate-400">
-                  <div className="flex flex-wrap gap-2">
+                <div className="mt-4 sm:mt-5 md:mt-6 space-y-2 sm:space-y-3 text-[0.65rem] sm:text-xs uppercase tracking-[0.3em] sm:tracking-[0.4em] text-slate-400">
+                  <div className="flex flex-wrap gap-1.5 sm:gap-2">
                     {event.tags.map((tag) => (
-                      <span key={tag} className="rounded-full bg-white/10 px-3 py-1 text-[0.6rem] text-sky-200">
+                      <span key={tag} className="rounded-full bg-white/10 px-2.5 sm:px-3 py-1 text-[0.55rem] sm:text-[0.6rem] text-sky-200">
                         {tag}
                       </span>
                     ))}
                   </div>
-                  <p className="text-slate-200">{event.schedule}</p>
+                  <p className="text-slate-200 text-xs sm:text-sm">{event.schedule}</p>
                 </div>
               </div>
             ))}
@@ -673,27 +765,27 @@ const TechfestLandingPage: FC = () => {
         </motion.section>
 
         <motion.section
-          className="grid gap-10 md:grid-cols-[1fr_1fr]"
+          className="grid gap-6 sm:gap-8 md:gap-10 md:grid-cols-[1fr_1fr]"
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, amount: 0.2 }}
           variants={sectionVariants}
         >
-          <div className="rounded-3xl border border-white/10 bg-linear-to-br from-blue-900/40 to-slate-900 p-8">
-            <h3 className="text-2xl font-semibold text-white">Collaboration Arenas</h3>
-            <p className="mt-4 text-sm text-slate-300">
+          <div className="rounded-2xl sm:rounded-3xl border border-white/10 bg-linear-to-br from-blue-900/40 to-slate-900 p-5 sm:p-6 md:p-8">
+            <h3 className="text-xl sm:text-2xl font-semibold text-white">Collaboration Arenas</h3>
+            <p className="mt-3 sm:mt-4 text-xs sm:text-sm text-slate-300">
               Choose from hybrid pods: AI + Design, BioTech + Data, Robotics + Storytelling, and more. Each arena pairs you with co-pilots who complement your craft.
             </p>
-            <ul className="mt-6 space-y-3 text-sm text-slate-200">
+            <ul className="mt-4 sm:mt-5 md:mt-6 space-y-2 sm:space-y-3 text-xs sm:text-sm text-slate-200">
               <li>↳ Daily sync huddles facilitated by alumni mentors</li>
               <li>↳ Immersive prototyping suites with spatial computing rigs</li>
               <li>↳ Collaboration heatmaps tracking your impact in real-time</li>
             </ul>
           </div>
-          <div className="grid gap-6">
-            <div className="rounded-3xl border border-white/10 bg-white/5 p-6 text-sm text-slate-200 backdrop-blur">
-              <p className="uppercase tracking-[0.4em] text-slate-400">Spotlight</p>
-              <p className="mt-3 text-lg text-white">
+          <div className="grid gap-4 sm:gap-5 md:gap-6">
+            <div className="rounded-2xl sm:rounded-3xl border border-white/10 bg-white/5 p-4 sm:p-5 md:p-6 text-xs sm:text-sm text-slate-200 backdrop-blur">
+              <p className="uppercase tracking-[0.3em] sm:tracking-[0.4em] text-slate-400">Spotlight</p>
+              <p className="mt-2 sm:mt-3 text-base sm:text-lg text-white">
                 “UTKRISHTA’s collab labs pushed our mixed reality healthcare prototype from idea to incubator-ready in three days.”
               </p>
               <span className="mt-4 block text-xs uppercase tracking-[0.3em] text-slate-400">
@@ -718,12 +810,12 @@ const TechfestLandingPage: FC = () => {
           variants={sectionVariants}
         >
           <div>
-            <h2 className="text-3xl font-semibold text-white md:text-4xl">FAQs</h2>
-            <p className="mt-3 max-w-2xl text-slate-300">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-semibold text-white">FAQs</h2>
+            <p className="mt-2 sm:mt-3 max-w-2xl text-sm sm:text-base text-slate-300">
               Everything you need to know to plug into the UTKRISHTA energy.
             </p>
           </div>
-          <div className="grid gap-6 md:grid-cols-2">
+          <div className="grid gap-4 sm:gap-5 md:gap-6 md:grid-cols-2">
             {faqs.map((faq, index) => {
               const isOpen = openFaqIndex === index;
               return (
@@ -771,8 +863,8 @@ const TechfestLandingPage: FC = () => {
         </motion.section>
       </main>
 
-      <footer className="border-t border-white/5 bg-slate-950/80 py-10">
-        <div className="mx-auto flex max-w-6xl flex-col gap-6 px-6 text-xs uppercase tracking-[0.4em] text-slate-500 md:flex-row md:items-center md:justify-between">
+      <footer className="border-t border-white/5 bg-slate-950/80 py-6 sm:py-8 md:py-10">
+        <div className="mx-auto flex max-w-6xl flex-col gap-4 sm:gap-5 md:gap-6 px-4 sm:px-6 text-xs uppercase tracking-[0.4em] text-slate-500 md:flex-row md:items-center md:justify-between">
           <span>© {new Date().getFullYear()} UTKRISHTA · IIIT Sri City</span>
           <div className="flex flex-wrap gap-4">
             <a href="#register" className="hover:text-sky-200">
