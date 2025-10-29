@@ -407,7 +407,7 @@ const TechfestLandingPage: FC = () => {
         initial="hidden"
         animate={animationState}
       >
-        <div className="mx-auto flex max-w-6xl items-center gap-4 px-4 sm:px-6 py-3 sm:py-4">
+        <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 sm:px-6 py-3 sm:py-4">
           <motion.a
             href="#home"
             onClick={(e) => {
@@ -425,42 +425,43 @@ const TechfestLandingPage: FC = () => {
               className="h-8 sm:h-10 md:h-12 w-auto drop-shadow-[0_0_18px_rgba(56,189,248,0.35)]"
             />
           </motion.a>
-          <motion.nav
-            className="nav-links ml-auto hidden items-center gap-6 lg:gap-8 text-sm font-medium uppercase tracking-[0.3em] text-slate-300 md:flex"
-            variants={headerNavVariants}
-            initial="hidden"
-            animate={animationState}
-          >
-            {navLinks.map((link) => (
-              <motion.a
-                key={link.label}
-                href={link.href}
-                onClick={(e) => handleNavClick(e, link.href)}
-                className="transition-colors hover:text-white cursor-pointer"
-                variants={headerItemVariants}
-              >
-                {link.label}
-              </motion.a>
-            ))}
-          </motion.nav>
-          <motion.a
-            href="#register"
-            onClick={(e) => handleNavClick(e, '#register')}
-            className="register-button hidden rounded-full border border-sky-400/70 px-4 lg:px-5 py-2 text-xs sm:text-sm font-semibold uppercase tracking-[0.3em] text-sky-200 transition hover:border-sky-300 hover:text-white cursor-pointer md:inline-flex"
-            variants={headerItemVariants}
-            initial="hidden"
-            animate={animationState}
-          >
-            Register
-          </motion.a>
-          
-          {/* Hamburger Menu Button */}
-          <button
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="md:hidden flex flex-col gap-1.5 p-2 cursor-pointer focus:outline-none focus:ring-2 focus:ring-sky-400 rounded-lg"
-            aria-label="Toggle menu"
-            aria-expanded={mobileMenuOpen}
-          >
+          <div className="flex items-center gap-4">
+            <motion.nav
+              className="nav-links hidden items-center gap-6 lg:gap-8 text-sm font-medium uppercase tracking-[0.3em] text-slate-300 md:flex"
+              variants={headerNavVariants}
+              initial="hidden"
+              animate={animationState}
+            >
+              {navLinks.map((link) => (
+                <motion.a
+                  key={link.label}
+                  href={link.href}
+                  onClick={(e) => handleNavClick(e, link.href)}
+                  className="transition-colors hover:text-white cursor-pointer"
+                  variants={headerItemVariants}
+                >
+                  {link.label}
+                </motion.a>
+              ))}
+            </motion.nav>
+            <motion.a
+              href="#register"
+              onClick={(e) => handleNavClick(e, '#register')}
+              className="register-button hidden rounded-full border border-sky-400/70 px-4 lg:px-5 py-2 text-xs sm:text-sm font-semibold uppercase tracking-[0.3em] text-sky-200 transition hover:border-sky-300 hover:text-white cursor-pointer md:inline-flex"
+              variants={headerItemVariants}
+              initial="hidden"
+              animate={animationState}
+            >
+              Register
+            </motion.a>
+            
+            {/* Hamburger Menu Button */}
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="md:hidden flex flex-col gap-1.5 p-2 cursor-pointer focus:outline-none focus:ring-2 focus:ring-sky-400 rounded-lg z-[100] relative"
+              aria-label="Toggle menu"
+              aria-expanded={mobileMenuOpen}
+            >
             <motion.span
               className="block h-0.5 w-6 bg-slate-300 rounded"
               animate={{
@@ -483,6 +484,7 @@ const TechfestLandingPage: FC = () => {
               transition={{ duration: 0.3 }}
             />
           </button>
+          </div>
         </div>
       </motion.header>
 
@@ -573,10 +575,10 @@ const TechfestLandingPage: FC = () => {
               animate={animationState}
             >
               <motion.div
-                className="hero-subheading mb-6 flex items-center gap-3 text-sm uppercase tracking-[0.6em] text-sky-300/90"
+                className="hero-subheading mb-6 flex items-center gap-12 text-sm uppercase tracking-[0.6em] text-sky-300/90"
                 variants={heroSubheadingVariants}
               >
-                <span className="rounded-full bg-sky-400/20 px-3 py-1 text-xs font-semibold text-sky-200">IIIT SriCity Presents</span>
+                <span className="rounded-full bg-sky-400/20 px-3 py-1 ml-4 text-xs font-semibold text-sky-200">IIIT SriCity Presents</span>
                 <span>annual techno fest</span>
               </motion.div>
               <motion.h1
@@ -593,19 +595,19 @@ const TechfestLandingPage: FC = () => {
               </motion.p>
               <motion.div
                 id="register"
-                className="mt-10 w-full max-w-2xl"
+                className="mt-8 sm:mt-10 w-full max-w-2xl px-2 sm:px-0"
                 variants={heroCardVariants}
               >
-                <div className="rounded-3xl border border-sky-500/40 bg-slate-950/70 p-6 shadow-lg shadow-sky-500/20 backdrop-blur">
-                  <div className="flex flex-wrap items-center justify-between gap-3 text-xs uppercase tracking-[0.45em] text-sky-200">
+                <div className="rounded-2xl sm:rounded-3xl border border-sky-500/40 bg-slate-950/70 p-4 sm:p-5 md:p-6 shadow-lg shadow-sky-500/20 backdrop-blur">
+                  <div className="flex flex-wrap items-center justify-between gap-2 sm:gap-3 text-xs uppercase tracking-[0.35em] sm:tracking-[0.45em] text-sky-200">
                     <span>THE COUNTDOWN IS FINAL. BE READY.</span>
                     <span className="text-sky-100">Nov 01</span>
                   </div>
-                  <div className="mt-4 sm:mt-6 grid grid-cols-2 gap-2 sm:gap-3 md:gap-4 sm:grid-cols-4">
+                  <div className="mt-3 sm:mt-4 md:mt-6 grid grid-cols-2 gap-1.5 sm:gap-2 md:gap-3 lg:gap-4 sm:grid-cols-4">
                     {countdownItems.map((item) => (
                       <div
                         key={item.label}
-                        className="relative overflow-hidden rounded-2xl border border-sky-500/30 bg-slate-900/80 p-4 shadow-inner shadow-sky-500/10"
+                        className="relative overflow-hidden rounded-xl sm:rounded-2xl border border-sky-500/30 bg-slate-900/80 p-2.5 sm:p-3 md:p-4 shadow-inner shadow-sky-500/10"
                       >
                         <span
                           className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(56,189,248,0.25),transparent_70%)]"
@@ -618,7 +620,7 @@ const TechfestLandingPage: FC = () => {
                       </div>
                     ))}
                   </div>
-                  <p className="mt-6 text-xs uppercase tracking-[0.30em] text-slate-400">
+                  <p className="mt-4 sm:mt-5 md:mt-6 text-[0.65rem] sm:text-xs uppercase tracking-[0.25em] sm:tracking-[0.30em] text-slate-400 px-1 sm:px-0">
                     {eventStarted
                       ? 'UTKRISHTA is live — dive in and claim your collab pod.'
                       : 'Sync your crew. Gates open sharp at midnight on November 1st.'}
@@ -731,10 +733,10 @@ const TechfestLandingPage: FC = () => {
             </div>
             <Link
               to="/schedule"
-              className="group relative inline-flex items-center gap-2 rounded-full border border-sky-400/50 bg-sky-400/10 px-6 py-3 text-xs uppercase tracking-[0.45em] text-sky-200 shadow-lg shadow-sky-400/30 transition-all hover:border-sky-300 hover:bg-sky-400/20 hover:text-white hover:shadow-xl hover:shadow-sky-400/50"
+              className="group relative inline-flex items-center justify-center gap-2 rounded-full border border-sky-400/50 bg-sky-400/10 px-6 py-3 text-xs uppercase tracking-[0.45em] text-sky-200 shadow-lg shadow-sky-400/30 transition-all hover:border-sky-300 hover:bg-sky-400/20 hover:text-white hover:shadow-xl hover:shadow-sky-400/50 text-center"
             >
               <span className="absolute inset-0 rounded-full bg-sky-400/20 blur-xl transition-opacity group-hover:opacity-75"></span>
-              <span className="relative">View Schedule →</span>
+              <span className="relative text-center">View Schedule →</span>
             </Link>
           </div>
 
