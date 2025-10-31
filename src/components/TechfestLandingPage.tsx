@@ -1087,8 +1087,9 @@ const TechfestLandingPage: FC = () => {
               ))}
             </motion.nav>
             <motion.a
-              href="#register"
-              onClick={(e) => handleNavClick(e, '#register')}
+              href="https://play.google.com/store/apps/details?id=com.campus.life.app"
+              target="_blank"
+              rel="noreferrer"
               className="register-button hidden rounded-full border border-sky-400/70 px-4 lg:px-5 py-2 text-xs sm:text-sm font-semibold uppercase tracking-[0.3em] text-sky-200 transition hover:border-sky-300 hover:text-white cursor-pointer md:inline-flex"
               variants={headerItemVariants}
               initial="hidden"
@@ -1167,11 +1168,10 @@ const TechfestLandingPage: FC = () => {
                     </motion.a>
                   ))}
                   <motion.a
-                    href="#register"
-                    onClick={(e) => {
-                      handleNavClick(e, '#register');
-                      setMobileMenuOpen(false);
-                    }}
+                    href="https://play.google.com/store/apps/details?id=com.campus.life.app"
+                    target="_blank"
+                    rel="noreferrer"
+                    onClick={() => setMobileMenuOpen(false)}
                     className="mt-4 px-4 py-3 text-sm font-semibold uppercase tracking-[0.3em] text-sky-200 border border-sky-400/70 rounded-lg text-center transition hover:border-sky-300 hover:text-white hover:bg-sky-400/10 cursor-pointer whitespace-nowrap"
                     initial={{ opacity: 0, x: 20 }}
                     animate={{ opacity: 1, x: 0 }}
@@ -1236,7 +1236,6 @@ const TechfestLandingPage: FC = () => {
                 A cinematic tech carnival where coders, designers, storytellers, and makers co-create the next wave of human-centered innovation.
               </motion.p>
               <motion.div
-                id="register"
                 className="mt-8 sm:mt-10 w-full max-w-2xl px-2 sm:px-0"
                 variants={heroCardVariants}
               >
