@@ -337,7 +337,7 @@ const SchedulePage = () => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.7 }}
       >
-        <div className="mx-auto flex max-w-6xl items-center gap-4 px-4 sm:px-6 py-3 sm:py-4">
+        <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 sm:px-6 py-3 sm:py-4">
           <Link
             to="/"
             onClick={(e) => {
@@ -352,44 +352,45 @@ const SchedulePage = () => {
               className="h-8 sm:h-10 md:h-12 w-auto drop-shadow-[0_0_18px_rgba(56,189,248,0.35)]"
             />
           </Link>
-          <nav className="ml-auto hidden items-center gap-6 lg:gap-8 text-sm font-medium uppercase tracking-[0.3em] text-slate-300 md:flex">
-            <Link
-              to="/"
-              onClick={(e) => handleNavClick(e, '/')}
-              className="transition-colors hover:text-white cursor-pointer"
+          <div className="flex items-center gap-4">
+            <nav className="hidden items-center gap-6 lg:gap-8 text-sm font-medium uppercase tracking-[0.3em] text-slate-300 md:flex">
+              <Link
+                to="/"
+                onClick={(e) => handleNavClick(e, '/')}
+                className="transition-colors hover:text-white cursor-pointer"
+              >
+                Home
+              </Link>
+              <Link
+                to="/#about"
+                onClick={(e) => handleNavClick(e, '/#about')}
+                className="transition-colors hover:text-white cursor-pointer"
+              >
+                About
+              </Link>
+              <Link
+                to="/#events"
+                onClick={(e) => handleNavClick(e, '/#events')}
+                className="transition-colors hover:text-white cursor-pointer"
+              >
+                Events
+              </Link>
+              <Link
+                to="/#faqs"
+                onClick={(e) => handleNavClick(e, '/#faqs')}
+                className="transition-colors hover:text-white cursor-pointer"
+              >
+                FAQs
+              </Link>
+            </nav>
+            
+            {/* Hamburger Menu Button */}
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="md:hidden flex flex-col gap-1.5 p-2 cursor-pointer focus:outline-none focus:ring-2 focus:ring-sky-400 rounded-lg z-[100] relative"
+              aria-label="Toggle menu"
+              aria-expanded={mobileMenuOpen}
             >
-              Home
-            </Link>
-            <Link
-              to="/#about"
-              onClick={(e) => handleNavClick(e, '/#about')}
-              className="transition-colors hover:text-white cursor-pointer"
-            >
-              About
-            </Link>
-            <Link
-              to="/#events"
-              onClick={(e) => handleNavClick(e, '/#events')}
-              className="transition-colors hover:text-white cursor-pointer"
-            >
-              Events
-            </Link>
-            <Link
-              to="/#faqs"
-              onClick={(e) => handleNavClick(e, '/#faqs')}
-              className="transition-colors hover:text-white cursor-pointer"
-            >
-              FAQs
-            </Link>
-          </nav>
-          
-          {/* Hamburger Menu Button */}
-          <button
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="md:hidden flex flex-col gap-1.5 p-2 cursor-pointer focus:outline-none focus:ring-2 focus:ring-sky-400 rounded-lg"
-            aria-label="Toggle menu"
-            aria-expanded={mobileMenuOpen}
-          >
             <motion.span
               className="block h-0.5 w-6 bg-slate-300 rounded"
               animate={{
@@ -412,6 +413,7 @@ const SchedulePage = () => {
               transition={{ duration: 0.3 }}
             />
           </button>
+          </div>
         </div>
       </motion.header>
 
