@@ -21,6 +21,24 @@ const CAROUSEL_IMAGES = [
   '/pics/DSC_3472.jpg',
 ];
 
+const FOOTER_SOCIAL_LINKS = [
+  {
+    id: 'instagram',
+    label: 'Instagram',
+    href: 'https://www.instagram.com/utkrishtaiiits',
+  },
+  {
+    id: 'linkedin',
+    label: 'LinkedIn',
+    href: 'https://www.linkedin.com/company/student-development-council-iiit-sri-city/posts/?feedView=all',
+  },
+  {
+    id: 'youtube',
+    label: 'YouTube',
+    href: 'https://www.youtube.com/@iiit-sricity9081',
+  }
+] as const;
+
 // Timeline Component
 const EventsTimeline: FC = () => {
   const [selectedDay, setSelectedDay] = useState(1);
@@ -251,7 +269,7 @@ const EventsTimeline: FC = () => {
                   </motion.div>
                   {/* Time Badge */}
                   <motion.div
-                    className="absolute -top-2 left-1/2 -translate-x-1/2 whitespace-nowrap px-2 py-1 rounded-md bg-sky-400/20 border border-sky-400/40 text-[0.6rem] sm:text-xs font-medium text-sky-200 backdrop-blur-sm"
+                    className="absolute -top-2 -left-2 sm:left-1/2 sm:-translate-x-1/2 whitespace-nowrap px-2 py-1 rounded-md bg-sky-400/20 border border-sky-400/40 text-[0.6rem] sm:text-xs font-medium text-sky-200 backdrop-blur-sm"
                     initial={{ opacity: 0, y: -15, scale: 0.8 }}
                     animate={{ opacity: 1, y: 0, scale: 1 }}
                     transition={{ 
@@ -355,9 +373,10 @@ const EventsTimeline: FC = () => {
 // Image Carousel Component
 const ImageCarousel: FC = () => {
   const [screenWidth, setScreenWidth] = useState(0);
+  const [activeIndex, setActiveIndex] = useState<number | null>(null);
 
-  const cardsPerView = 4;
   const gap = 16; // gap between cards in pixels
+  const activeCardTimeout = useRef<number | null>(null);
 
   useEffect(() => {
     const updateWidth = () => {
@@ -369,11 +388,34 @@ const ImageCarousel: FC = () => {
     return () => window.removeEventListener('resize', updateWidth);
   }, []);
 
-  // Calculate card size based on full screen width to show exactly 4 cards
-  // Account for gaps between cards
-  const cardSize = screenWidth > 0 
-    ? Math.floor((screenWidth - (gap * (cardsPerView - 1))) / cardsPerView)
-    : 300;
+  useEffect(() => () => {
+    if (activeCardTimeout.current != null) {
+      window.clearTimeout(activeCardTimeout.current);
+    }
+  }, []);
+
+  const handleActivateCard = useCallback((index: number) => {
+    setActiveIndex(index);
+    if (activeCardTimeout.current != null) {
+      window.clearTimeout(activeCardTimeout.current);
+    }
+    activeCardTimeout.current = window.setTimeout(() => {
+      setActiveIndex((current) => (current === index ? null : current));
+    }, 1500);
+  }, []);
+
+  const cardsPerView = useMemo(() => {
+    if (screenWidth >= 1280) return 4;
+    if (screenWidth >= 1024) return 3;
+    if (screenWidth >= 768) return 2.5;
+    if (screenWidth >= 480) return 2;
+    return 1.4;
+  }, [screenWidth]);
+
+  // Calculate card size based on dynamic cards per view and include gaps
+  const cardSize = screenWidth > 0
+    ? Math.floor((screenWidth - gap * (cardsPerView - 1)) / cardsPerView)
+    : 240;
 
   // Duplicate images for seamless loop (2 sets is enough for smooth looping)
   const duplicatedImages = useMemo(() => [...CAROUSEL_IMAGES, ...CAROUSEL_IMAGES], []);
@@ -385,12 +427,12 @@ const ImageCarousel: FC = () => {
   );
 
   return (
-    <div 
+    <div
       className="relative overflow-hidden"
-      style={{ 
-        width: '100vw',
-        marginLeft: 'calc(-50vw + 50%)',
-        marginRight: 'calc(-50vw + 50%)',
+      style={{
+        width: screenWidth >= 1024 ? '100vw' : '100%',
+        marginLeft: screenWidth >= 1024 ? 'calc(-50vw + 50%)' : undefined,
+        marginRight: screenWidth >= 1024 ? 'calc(-50vw + 50%)' : undefined,
       }}
     >
       <div 
@@ -421,32 +463,40 @@ const ImageCarousel: FC = () => {
             },
           }}
         >
-          {duplicatedImages.map((image, index) => (
-            <div
-              key={`${image}-${index}`}
-              className="flex-shrink-0 relative group"
-              style={{
-                width: `${cardSize}px`,
-                height: `${cardSize}px`,
-                willChange: 'transform',
-                backfaceVisibility: 'hidden',
-              }}
-            >
-              <div className="absolute inset-0 rounded-xl sm:rounded-2xl border border-white/20 bg-white/5 overflow-hidden">
-                <img
-                  src={image}
-                  alt={`UTKRISHTA Previous Year ${(index % CAROUSEL_IMAGES.length) + 1}`}
-                  className="w-full h-full object-cover grayscale transition-all duration-500 ease-in-out group-hover:grayscale-0"
-                  loading="lazy"
-                  style={{
-                    willChange: 'filter',
-                    backfaceVisibility: 'hidden',
-                  }}
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/40 via-transparent to-transparent pointer-events-none" />
+          {duplicatedImages.map((image, index) => {
+            const isActive = activeIndex === index;
+            return (
+              <div
+                key={`${image}-${index}`}
+                className="flex-shrink-0 relative group"
+                style={{
+                  width: `${cardSize}px`,
+                  height: `${cardSize}px`,
+                  willChange: 'transform',
+                  backfaceVisibility: 'hidden',
+                }}
+                onPointerDown={(event) => {
+                  if (event.pointerType === 'touch') {
+                    handleActivateCard(index);
+                  }
+                }}
+              >
+                <div className="absolute inset-0 rounded-xl sm:rounded-2xl border border-white/20 bg-white/5 overflow-hidden">
+                  <img
+                    src={image}
+                    alt={`UTKRISHTA Previous Year ${(index % CAROUSEL_IMAGES.length) + 1}`}
+                    className={`w-full h-full object-cover transition-all duration-500 ease-in-out ${isActive ? 'grayscale-0' : 'grayscale'} group-hover:grayscale-0`}
+                    loading="lazy"
+                    style={{
+                      willChange: 'filter',
+                      backfaceVisibility: 'hidden',
+                    }}
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950/40 via-transparent to-transparent pointer-events-none" />
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </motion.div>
       </div>
     </div>
@@ -839,6 +889,64 @@ const navLinks = [
   { label: 'FAQs', href: '#faqs' },
 ];
 
+type FooterSocialId = typeof FOOTER_SOCIAL_LINKS[number]['id'];
+
+const FOOTER_SOCIAL_ICONS: Record<FooterSocialId, React.ReactNode> = {
+  instagram: (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.4"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className="h-5 w-5"
+    >
+      <rect x={3.2} y={3.2} width={17.6} height={17.6} rx={5} />
+      <circle cx={12} cy={12} r={4.2} />
+      <circle cx={17.3} cy={6.7} r={0.8} fill="currentColor" stroke="none" />
+    </svg>
+  ),
+  linkedin: (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.6"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className="h-5 w-5"
+    >
+      <rect x={3} y={3} width={18} height={18} rx={3.6} />
+      <line x1={8.4} y1={10.3} x2={8.4} y2={16.5} />
+      <line x1={8.4} y1={7.7} x2={8.4} y2={7.8} />
+      <path d="M12.6 16.5V10.9c1.5-1 3.9-0.3 3.9 1.7v3.9" />
+    </svg>
+  ),
+  youtube: (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.4"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className="h-5 w-5"
+    >
+      <path d="M3.5 8.6c0-1.6 1.2-3 2.8-3.2 3-0.4 8.4-0.4 11.4 0 1.6 0.2 2.8 1.6 2.8 3.2v6.8c0 1.6-1.2 3-2.8 3.2-3 0.4-8.4 0.4-11.4 0-1.6-0.2-2.8-1.6-2.8-3.2z" />
+      <path d="M10.4 9.3l4.8 2.7-4.8 2.7z" fill="currentColor" stroke="none" />
+    </svg>
+  )
+};
+
+const FooterDivider: FC = () => (
+  <div className="flex items-center justify-center gap-4">
+    <span className="h-px w-14 bg-linear-to-r from-transparent via-sky-400/60 to-transparent" />
+    <div className="grid h-2.5 w-2.5 rotate-45 place-items-center border border-sky-400/60 bg-slate-950" />
+    <span className="h-px w-14 bg-linear-to-r from-transparent via-sky-400/60 to-transparent" />
+  </div>
+);
+
 const TechfestLandingPage: FC = () => {
   const [timeLeft, setTimeLeft] = useState<TimeRemaining>(() => computeTimeRemaining());
   const [logoSequenceComplete, setLogoSequenceComplete] = useState(false);
@@ -904,7 +1012,7 @@ const TechfestLandingPage: FC = () => {
     }
     const element = document.querySelector(href);
     if (element) {
-      const headerOffset = 80;
+      const headerOffset = 100;
       const elementPosition = element.getBoundingClientRect().top;
       const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
       window.scrollTo({
@@ -1109,10 +1217,10 @@ const TechfestLandingPage: FC = () => {
               animate={animationState}
             >
               <motion.div
-                className="hero-subheading mb-6 flex items-center gap-12 text-sm uppercase tracking-[0.6em] text-sky-300/90"
+                className="hero-subheading mb-6 flex flex-col items-center -mt-5 gap-2 text-xs uppercase tracking-[0.45em] text-sky-300/90 sm:flex-row sm:gap-12 sm:text-sm sm:tracking-[0.6em]"
                 variants={heroSubheadingVariants}
               >
-                <span className="rounded-full bg-sky-400/20 px-3 py-1 ml-4 text-xs font-semibold text-sky-200">IIIT SriCity Presents</span>
+                <span className="rounded-full bg-sky-400/20 px-3 py-1 text-[0.7rem] font-semibold text-sky-200 sm:text-xs">IIIT SriCity Presents</span>
                 <span>annual techno fest</span>
               </motion.div>
               <motion.h1
@@ -1156,8 +1264,8 @@ const TechfestLandingPage: FC = () => {
                   </div>
                   <p className="mt-4 sm:mt-5 md:mt-6 text-[0.65rem] sm:text-xs uppercase tracking-[0.25em] sm:tracking-[0.30em] text-slate-400 px-1 sm:px-0">
                     {eventStarted
-                      ? 'UTKRISHTA is live — dive in and claim your collab pod.'
-                      : 'Sync your crew. Gates open sharp at midnight on November 1st.'}
+                      ? 'UTKRISHTA is live — dive in and claim your collab pod. Don\'t forget to register via campus life app!'
+                      : 'Sync your crew. Gates open sharp at midnight on November 1st. Download campus life app to register.'}
                   </p>
                 </div>
               </motion.div>
@@ -1224,7 +1332,7 @@ const TechfestLandingPage: FC = () => {
               </div>
               <div className="rounded-3xl border border-indigo-400/30 bg-indigo-400/10 p-5 text-indigo-100">
                 <p className="text-sm uppercase tracking-[0.4em]">Mentor Speedruns</p>
-                <p className="mt-3 text-xl font-semibold">Meet industry catalysts, venture scouts, and alumni champions.</p>
+                <p className="mt-3 text-xl font-semibold">Engage with club pioneers, hackathon winners, and creative trailblazers.</p>
               </div>
             </div>
           </div>
@@ -1238,10 +1346,10 @@ const TechfestLandingPage: FC = () => {
             <div className="rounded-3xl border border-white/10 bg-linear-to-br from-slate-900 to-slate-950 p-6">
               <h3 className="text-xl font-semibold text-white">Pulse of the Fest</h3>
               <ul className="mt-5 space-y-4 text-sm text-slate-300">
-                <li>⚡ Lightning Labs every morning</li>
-                <li>🎛️ Collaboration Studio with realtime dashboards</li>
-                <li>🛰️ Student ventures pitching to micro-funds</li>
-                <li>🎶 Sundown synthwave social + creator lounge</li>
+                <li>⚡ High-Octane Hackathons & Tech Challenges</li>
+                <li>🎮 Epic Esports & Gaming Showdowns</li>
+                <li>🎶 Vibrant Cultural & Creative Contests</li>
+                <li>🏆 Thrilling Sports & Fitness Battles</li>
               </ul>
               <div className="mt-8 rounded-2xl border border-white/10 bg-slate-800/40 p-4 text-xs uppercase tracking-[0.35em] text-slate-300">
                 Curated by the UTKRISHTA student council with support from IIIT Sri City innovation partners.
@@ -1278,43 +1386,6 @@ const TechfestLandingPage: FC = () => {
         </motion.section>
 
         <motion.section
-          className="grid gap-6 sm:gap-8 md:gap-10 md:grid-cols-[1fr_1fr]"
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, amount: 0.2 }}
-          variants={sectionVariants}
-        >
-          <div className="rounded-2xl sm:rounded-3xl border border-white/10 bg-linear-to-br from-blue-900/40 to-slate-900 p-5 sm:p-6 md:p-8">
-            <h3 className="text-xl sm:text-2xl font-semibold text-white">Collaboration Arenas</h3>
-            <p className="mt-3 sm:mt-4 text-xs sm:text-sm text-slate-300">
-              Choose from hybrid pods: AI + Design, BioTech + Data, Robotics + Storytelling, and more. Each arena pairs you with co-pilots who complement your craft.
-            </p>
-            <ul className="mt-4 sm:mt-5 md:mt-6 space-y-2 sm:space-y-3 text-xs sm:text-sm text-slate-200">
-              <li>↳ Daily sync huddles facilitated by alumni mentors</li>
-              <li>↳ Immersive prototyping suites with spatial computing rigs</li>
-              <li>↳ Collaboration heatmaps tracking your impact in real-time</li>
-            </ul>
-          </div>
-          <div className="grid gap-4 sm:gap-5 md:gap-6">
-            <div className="rounded-2xl sm:rounded-3xl border border-white/10 bg-white/5 p-4 sm:p-5 md:p-6 text-xs sm:text-sm text-slate-200 backdrop-blur">
-              <p className="uppercase tracking-[0.3em] sm:tracking-[0.4em] text-slate-400">Spotlight</p>
-              <p className="mt-2 sm:mt-3 text-base sm:text-lg text-white">
-                “UTKRISHTA’s collab labs pushed our mixed reality healthcare prototype from idea to incubator-ready in three days.”
-              </p>
-              <span className="mt-4 block text-xs uppercase tracking-[0.3em] text-slate-400">
-                2024 Winning Team — Project SyncPulse
-              </span>
-            </div>
-            <div className="rounded-3xl border border-white/10 bg-slate-900/60 p-6 text-sm text-slate-200">
-              <p className="uppercase tracking-[0.4em] text-slate-400">Powered By</p>
-              <p className="mt-3 text-lg text-white">
-                IIIT Sri City Innovation Lab · Sri City Smart Ecosystem · Industry Guild Partners · Alumni Collective
-              </p>
-            </div>
-          </div>
-        </motion.section>
-
-        <motion.section
           id="faqs"
           className="flex flex-col gap-8"
           initial="hidden"
@@ -1328,7 +1399,7 @@ const TechfestLandingPage: FC = () => {
               Everything you need to know to plug into the UTKRISHTA energy.
             </p>
           </div>
-          <div className="grid gap-4 sm:gap-5 md:gap-6 md:grid-cols-2">
+          <div className="grid items-start gap-4 sm:gap-5 md:gap-6 md:grid-cols-2">
             {faqs.map((faq, index) => {
               const isOpen = openFaqIndex === index;
               return (
@@ -1376,21 +1447,82 @@ const TechfestLandingPage: FC = () => {
         </motion.section>
       </main>
 
-      <footer className="border-t border-white/5 bg-slate-950/80 py-6 sm:py-8 md:py-10">
-        <div className="mx-auto flex max-w-6xl flex-col gap-4 sm:gap-5 md:gap-6 px-4 sm:px-6 text-xs uppercase tracking-[0.4em] text-slate-500 md:flex-row md:items-center md:justify-between">
-          <span>© {new Date().getFullYear()} UTKRISHTA · IIIT Sri City</span>
-          <div className="flex flex-wrap gap-4">
-            <a href="#register" className="hover:text-sky-200">
-              Become a Partner
-            </a>
-            <a href="mailto:utkrishta@iiits.in" className="hover:text-sky-200">
-              Contact Us
-            </a>
-            <a href="#" className="hover:text-sky-200">
-              Code of Collaboration
-            </a>
+      <footer className="relative overflow-hidden border-t border-white/10 bg-slate-950/90">
+        <div className="absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-sky-400/30 to-transparent" />
+
+        <div className="relative mx-auto flex max-w-4xl flex-col items-center gap-4 px-4 py-7 text-center">
+          <div className="relative flex items-center justify-center">
+            <motion.div
+              className="absolute h-20 w-20 rounded-full bg-sky-500/15 blur-2xl"
+              animate={{ opacity: [0.2, 0.38, 0.2], scale: [0.88, 1.04, 0.88] }}
+              transition={{ duration: 7, repeat: Infinity, ease: 'easeInOut' }}
+            />
+            <motion.img
+              src="/uk.png"
+              alt="Utkrishta emblem"
+              className="relative h-12 w-auto object-contain sm:h-16"
+              initial={{ opacity: 0, y: 12 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.4 }}
+              transition={{ duration: 0.8, ease: easeOutExpo }}
+              animate={{ y: [0, -3, 0] }}
+              whileHover={{ scale: 1.03 }}
+            />
           </div>
+
+          <FooterDivider />
+
+          <div className="flex flex-wrap items-center justify-center gap-2.5 text-sky-100">
+            {FOOTER_SOCIAL_LINKS.map((social, index) => (
+              <motion.a
+                key={social.id}
+                href={social.href}
+                target="_blank"
+                rel="noreferrer"
+                aria-label={social.label}
+                className="group relative flex h-9 w-9 items-center justify-center rounded-full border border-sky-500/30 bg-slate-900/70 transition-shadow duration-300"
+                initial={{ opacity: 0, y: 8, scale: 0.92 }}
+                whileInView={{ opacity: 1, y: 0, scale: 1 }}
+                viewport={{ once: true, amount: 0.4 }}
+                transition={{ duration: 0.6, ease: easeOutExpo, delay: index * 0.08 }}
+                whileHover={{ scale: 1.08, rotate: 1.5, boxShadow: '0 0 22px rgba(56,189,248,0.3)' }}
+                whileTap={{ scale: 0.94 }}
+              >
+                <motion.span
+                  className="absolute inset-0 rounded-full opacity-0"
+                  style={{ background: 'radial-gradient(circle, rgba(56,189,248,0.35) 0%, rgba(30,41,59,0) 65%)' }}
+                  whileHover={{ opacity: 1 }}
+                  transition={{ duration: 0.3, ease: 'easeOut' }}
+                />
+                <span className="relative text-sky-200">{FOOTER_SOCIAL_ICONS[social.id]}</span>
+              </motion.a>
+            ))}
+          </div>
+
+          <motion.p
+            className="text-[0.6rem] uppercase tracking-[0.3em] text-slate-300"
+            initial={{ opacity: 0, y: 10 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.4 }}
+            transition={{ duration: 0.7, ease: easeOutExpo, delay: 0.2 }}
+          >
+            Designed by IIITS Team
+          </motion.p>
+
+          <FooterDivider />
+
+          <motion.div
+            className="text-[0.6rem] uppercase tracking-[0.3em] text-slate-400"
+            initial={{ opacity: 0, y: 10 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.4 }}
+            transition={{ duration: 0.7, ease: easeOutExpo, delay: 0.3 }}
+          >
+            © {new Date().getFullYear()} Utkrishta · IIIT Sri City
+          </motion.div>
         </div>
+
+        <div className="absolute inset-x-0 bottom-0 h-px bg-linear-to-r from-transparent via-sky-400/20 to-transparent" />
       </footer>
     </motion.div>
   );
