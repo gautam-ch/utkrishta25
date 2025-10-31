@@ -636,7 +636,7 @@ const TechfestLandingPage: FC = () => {
             variants={sectionVariants}
             transition={{ staggerChildren: 0.15 }}
           >
-            {["5K+ Innovators", "48 Hrs of Creation", "70+ Mentors"].map((stat, index) => (
+            {/* {["5K+ Innovators", "48 Hrs of Creation", "70+ Mentors"].map((stat, index) => (
               <motion.div
                 key={stat}
                 className="rounded-2xl sm:rounded-3xl border border-white/10 bg-white/5 p-4 sm:p-5 md:p-6 backdrop-blur"
@@ -645,7 +645,7 @@ const TechfestLandingPage: FC = () => {
                 <p className="text-xs sm:text-sm uppercase tracking-[0.3em] sm:tracking-[0.4em] text-slate-400">Highlight 0{index + 1}</p>
                 <p className="mt-3 sm:mt-4 text-xl sm:text-2xl font-semibold text-white">{stat}</p>
               </motion.div>
-            ))}
+            ))} */}
           </motion.div>
         </section>
 
