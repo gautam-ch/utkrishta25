@@ -1,107 +1,453 @@
-import React, { useCallback, useEffect, useState, type FC } from 'react';
+import React, { useCallback, useEffect, useState, useRef, useMemo, type FC } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, type Variants, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import LogoTeaserAnimation from './LogoTeaserAnimation';
 
-// Image Carousel Component
-const ImageCarousel: FC = () => {
-  const [currentIndex, setCurrentIndex] = useState(0);
-  
-  // Convert Google Drive links to direct image URLs
-  const images = [
-    '/pics/DSC_0015.JPG',
-    '/pics/DSC_0153.JPG',
-    '/pics/DSC_0451.JPG',
-    '/pics/DSC_1401.JPG',
-    '/pics/DSC_1433.JPG',
-    '/pics/DSC_2921.jpg',
-    '/pics/DSC_3102.jpg',
-    '/pics/DSC_3127.jpg',
-    '/pics/DSC_3294.jpg',
-    '/pics/DSC_3312.jpg',
-    '/pics/DSC_3373.jpg',
-    '/pics/DSC_3465.jpg',
-    '/pics/DSC_3472.jpg',
-  ];
+// Image array constant
+const CAROUSEL_IMAGES = [
+  '/pics/DSC_0015.JPG',
+  '/pics/DSC_0153.JPG',
+  '/pics/DSC_0451.JPG',
+  '/pics/DSC_1401.JPG',
+  '/pics/DSC_1433.JPG',
+  '/pics/DSC_2921.jpg',
+  '/pics/DSC_3102.jpg',
+  '/pics/DSC_3127.jpg',
+  '/pics/DSC_3294.jpg',
+  '/pics/DSC_3312.jpg',
+  '/pics/DSC_3373.jpg',
+  '/pics/DSC_3465.jpg',
+  '/pics/DSC_3472.jpg',
+];
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentIndex((prev) => (prev + 1) % images.length);
-    }, 4000);
+// Timeline Component
+const EventsTimeline: FC = () => {
+  const [selectedDay, setSelectedDay] = useState(1);
+  const currentEvents = eventsByDay[selectedDay] || [];
 
-    return () => clearInterval(interval);
-  }, [images.length]);
-
-  const goToSlide = (index: number) => {
-    setCurrentIndex(index);
+  const timelineItemVariants: Variants = {
+    hidden: { opacity: 0, x: -50, rotateY: -15 },
+    visible: {
+      opacity: 1,
+      x: 0,
+      rotateY: 0,
+      transition: {
+        duration: 0.6,
+        ease: easeOutExpo,
+      },
+    },
+    exit: {
+      opacity: 0,
+      x: 50,
+      rotateY: 15,
+      transition: {
+        duration: 0.4,
+        ease: easeOutExpo,
+      },
+    },
   };
 
-  const goToPrevious = () => {
-    setCurrentIndex((prev) => (prev - 1 + images.length) % images.length);
-  };
-
-  const goToNext = () => {
-    setCurrentIndex((prev) => (prev + 1) % images.length);
+  const cardHoverVariants: Variants = {
+    rest: {
+      scale: 1,
+      rotateX: 0,
+      rotateY: 0,
+      z: 0,
+    },
+    hover: {
+      scale: 1.03,
+      rotateX: 2,
+      rotateY: -2,
+      z: 10,
+      transition: {
+        duration: 0.3,
+        ease: easeOutExpo,
+      },
+    },
   };
 
   return (
-    <div className="relative w-full overflow-hidden rounded-2xl sm:rounded-3xl border border-white/10 bg-white/5 backdrop-blur">
-      <div className="relative h-[250px] sm:h-[350px] md:h-[400px] lg:h-[500px]">
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={currentIndex}
-            initial={{ opacity: 0, x: 100 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -100 }}
-            transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-            className="absolute inset-0"
+    <div className="flex flex-col gap-8">
+      {/* Day Selection Buttons */}
+      <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4">
+        {[1, 2, 3, 4, 5, 6, 7].map((day) => (
+          <motion.button
+            key={day}
+            onClick={() => setSelectedDay(day)}
+            className={`relative px-4 sm:px-6 py-2 sm:py-3 rounded-full border transition-all duration-300 uppercase tracking-[0.2em] text-xs sm:text-sm font-semibold overflow-hidden ${
+              selectedDay === day
+                ? 'border-sky-400 bg-sky-400/20 text-sky-200 shadow-lg shadow-sky-400/30'
+                : 'border-white/20 bg-white/5 text-slate-300 hover:border-white/40 hover:bg-white/10'
+            }`}
+            whileHover={{ scale: 1.08, y: -2 }}
+            whileTap={{ scale: 0.95 }}
+            initial={{ opacity: 0, y: 20, rotateX: -90 }}
+            animate={{ opacity: 1, y: 0, rotateX: 0 }}
+            transition={{ duration: 0.5, delay: day * 0.06, ease: easeOutExpo }}
           >
-            <img
-              src={images[currentIndex]}
-              alt={`UTKRISHTA Previous Year ${currentIndex + 1}`}
-              className="h-full w-full object-cover"
-              loading="lazy"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-950/20 to-transparent" />
-          </motion.div>
-        </AnimatePresence>
+            {selectedDay === day && (
+              <>
+                <motion.span
+                  className="absolute inset-0 rounded-full bg-sky-400/20 blur-xl"
+                  layoutId="activeDay"
+                  transition={{ type: "spring", bounce: 0.3, duration: 0.7 }}
+                />
+                <motion.div
+                  className="absolute inset-0 bg-gradient-to-r from-sky-400/20 via-sky-400/10 to-transparent"
+                  animate={{
+                    x: ['-100%', '100%'],
+                  }}
+                  transition={{
+                    duration: 2,
+                    repeat: Infinity,
+                    repeatType: "loop",
+                    ease: "linear",
+                  }}
+                />
+              </>
+            )}
+            <span className="relative z-10">Day {day}</span>
+          </motion.button>
+        ))}
+      </div>
 
-        {/* Navigation Arrows */}
-        <button
-          onClick={goToPrevious}
-          className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 rounded-full border border-white/20 bg-white/10 p-2 sm:p-3 text-white backdrop-blur transition-all hover:bg-white/20 hover:border-white/40"
-          aria-label="Previous image"
+      {/* Timeline */}
+      <div className="relative">
+        {/* Animated Vertical Line with Glow */}
+        <motion.div
+          className="absolute left-6 sm:left-8 top-0 bottom-0 w-0.5"
+          initial={{ scaleY: 0, opacity: 0 }}
+          animate={{ scaleY: 1, opacity: 1 }}
+          transition={{ duration: 0.8, ease: easeOutExpo }}
         >
-          <svg className="h-4 w-4 sm:h-5 sm:w-5 md:h-6 md:w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-          </svg>
-        </button>
-        <button
-          onClick={goToNext}
-          className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 rounded-full border border-white/20 bg-white/10 p-2 sm:p-3 text-white backdrop-blur transition-all hover:bg-white/20 hover:border-white/40"
-          aria-label="Next image"
-        >
-          <svg className="h-4 w-4 sm:h-5 sm:w-5 md:h-6 md:w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-          </svg>
-        </button>
-
-        {/* Dots Indicator */}
-        <div className="absolute bottom-6 left-1/2 flex -translate-x-1/2 gap-2">
-          {images.map((_, index) => (
-            <button
-              key={index}
-              onClick={() => goToSlide(index)}
-              className={`h-2 rounded-full transition-all ${
-                index === currentIndex
-                  ? 'w-8 bg-sky-400'
-                  : 'w-2 bg-white/30 hover:bg-white/50'
-              }`}
-              aria-label={`Go to slide ${index + 1}`}
+          <div className="absolute inset-0 bg-gradient-to-b from-sky-400/60 via-sky-400/40 to-slate-800/40" />
+          <motion.div
+            className="absolute inset-0 bg-gradient-to-b from-sky-400/80 via-sky-400/60 to-slate-800/40 blur-sm"
+            animate={{
+              opacity: [0.4, 0.8, 0.4],
+            }}
+            transition={{
+              duration: 2,
+              repeat: Infinity,
+              ease: "easeInOut",
+            }}
+          />
+          {/* Animated pulse dots along the line */}
+          {currentEvents.map((_, index) => (
+            <motion.div
+              key={`pulse-${index}`}
+              className="absolute left-1/2 -translate-x-1/2 w-2 h-2 rounded-full bg-sky-400"
+              style={{
+                top: `${(index / (currentEvents.length - 1 || 1)) * 100}%`,
+              }}
+              animate={{
+                scale: [1, 1.5, 1],
+                opacity: [0.6, 1, 0.6],
+              }}
+              transition={{
+                duration: 2,
+                repeat: Infinity,
+                delay: index * 0.3,
+                ease: "easeInOut",
+              }}
             />
           ))}
-        </div>
+        </motion.div>
+
+        {/* Timeline Items */}
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={selectedDay}
+            initial="hidden"
+            animate="visible"
+            exit="exit"
+            variants={{
+              hidden: { opacity: 0 },
+              visible: {
+                opacity: 1,
+                transition: {
+                  staggerChildren: 0.2,
+                  delayChildren: 0.15,
+                },
+              },
+              exit: {
+                opacity: 0,
+                transition: {
+                  staggerChildren: 0.1,
+                  staggerDirection: -1,
+                },
+              },
+            }}
+            className="space-y-6 sm:space-y-8"
+          >
+            {currentEvents.map((event, index) => (
+              <motion.div
+                key={`${selectedDay}-${index}`}
+                variants={timelineItemVariants}
+                className="relative flex items-start gap-4 sm:gap-6"
+              >
+                {/* Connecting Line to Card */}
+                <motion.div
+                  className="absolute left-6 sm:left-8 top-6 sm:top-7 w-4 sm:w-6 h-0.5 bg-gradient-to-r from-sky-400/60 to-transparent"
+                  initial={{ scaleX: 0 }}
+                  animate={{ scaleX: 1 }}
+                  transition={{ delay: index * 0.2 + 0.3, duration: 0.5, ease: easeOutExpo }}
+                />
+
+                {/* Timeline Dot with Pulse Animation */}
+                <div className="relative z-10 flex-shrink-0">
+                  {/* Outer glow ring */}
+                  <motion.div
+                    className="absolute inset-0 rounded-full bg-sky-400/30 blur-md"
+                    animate={{
+                      scale: [1, 1.5, 1],
+                      opacity: [0.5, 0.8, 0.5],
+                    }}
+                    transition={{
+                      duration: 2,
+                      repeat: Infinity,
+                      ease: "easeInOut",
+                      delay: index * 0.2,
+                    }}
+                  />
+                  <motion.div
+                    className="w-12 h-12 sm:w-14 sm:h-14 rounded-full border-2 border-sky-400/60 bg-slate-950 flex items-center justify-center backdrop-blur relative overflow-hidden"
+                    initial={{ scale: 0, rotate: -180 }}
+                    animate={{ scale: 1, rotate: 0 }}
+                    transition={{ 
+                      delay: index * 0.2 + 0.2, 
+                      type: "spring", 
+                      bounce: 0.5,
+                      duration: 0.8 
+                    }}
+                    whileHover={{ scale: 1.15, rotate: 360 }}
+                  >
+                    {/* Rotating gradient inside */}
+                    <motion.div
+                      className="absolute inset-0 bg-gradient-to-br from-sky-400/40 to-sky-600/20"
+                      animate={{ rotate: 360 }}
+                      transition={{
+                        duration: 3,
+                        repeat: Infinity,
+                        ease: "linear",
+                      }}
+                    />
+                    <motion.div
+                      className="relative w-3 h-3 sm:w-4 sm:h-4 rounded-full bg-sky-400 shadow-lg shadow-sky-400/70 z-10"
+                      animate={{
+                        boxShadow: [
+                          '0 0 0 0 rgba(56, 189, 248, 0.7)',
+                          '0 0 0 8px rgba(56, 189, 248, 0)',
+                          '0 0 0 0 rgba(56, 189, 248, 0)',
+                        ],
+                      }}
+                      transition={{
+                        duration: 2,
+                        repeat: Infinity,
+                        delay: index * 0.3,
+                      }}
+                    />
+                  </motion.div>
+                  {/* Time Badge */}
+                  <motion.div
+                    className="absolute -top-2 left-1/2 -translate-x-1/2 whitespace-nowrap px-2 py-1 rounded-md bg-sky-400/20 border border-sky-400/40 text-[0.6rem] sm:text-xs font-medium text-sky-200 backdrop-blur-sm"
+                    initial={{ opacity: 0, y: -15, scale: 0.8 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    transition={{ 
+                      delay: index * 0.2 + 0.4,
+                      type: "spring",
+                      bounce: 0.4 
+                    }}
+                    whileHover={{ scale: 1.1, y: -2 }}
+                  >
+                    {event.time}
+                  </motion.div>
+                </div>
+
+                {/* Event Card with Enhanced Animations */}
+                <motion.div
+                  className="flex-1 rounded-2xl sm:rounded-3xl border border-white/10 bg-white/5 p-4 sm:p-5 md:p-6 backdrop-blur group relative overflow-hidden"
+                  variants={cardHoverVariants}
+                  initial="rest"
+                  whileHover="hover"
+                  style={{ perspective: 1000 }}
+                >
+                  {/* Animated gradient overlay */}
+                  <motion.div
+                    className="absolute inset-0 rounded-2xl sm:rounded-3xl bg-gradient-to-r from-sky-400/10 via-sky-400/5 to-transparent"
+                    initial={{ opacity: 0, x: '-100%' }}
+                    whileHover={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.5 }}
+                  />
+                  {/* Shimmer effect */}
+                  <motion.div
+                    className="absolute inset-0 rounded-2xl sm:rounded-3xl bg-gradient-to-r from-transparent via-white/5 to-transparent"
+                    animate={{
+                      x: ['-200%', '200%'],
+                    }}
+                    transition={{
+                      duration: 3,
+                      repeat: Infinity,
+                      repeatDelay: 2,
+                      ease: "easeInOut",
+                    }}
+                  />
+                  {/* Glow effect on hover */}
+                  <motion.div
+                    className="absolute -inset-0.5 rounded-2xl sm:rounded-3xl bg-gradient-to-r from-sky-400/20 via-sky-400/10 to-sky-400/20 opacity-0 blur-sm"
+                    whileHover={{ opacity: 1 }}
+                    transition={{ duration: 0.3 }}
+                  />
+                  
+                  <div className="relative z-10">
+                    <div className="flex flex-wrap items-center gap-2 sm:gap-3 mb-3">
+                      {event.tags.map((tag, tagIndex) => (
+                        <motion.span
+                          key={tag}
+                          className="rounded-full bg-sky-400/20 border border-sky-400/30 px-2.5 sm:px-3 py-1 text-[0.55rem] sm:text-[0.6rem] text-sky-200 font-medium backdrop-blur-sm"
+                          initial={{ opacity: 0, scale: 0.5, y: 10 }}
+                          animate={{ opacity: 1, scale: 1, y: 0 }}
+                          transition={{ 
+                            delay: index * 0.2 + tagIndex * 0.08 + 0.3,
+                            type: "spring",
+                            bounce: 0.5 
+                          }}
+                          whileHover={{ 
+                            scale: 1.1, 
+                            backgroundColor: 'rgba(56, 189, 248, 0.3)',
+                            borderColor: 'rgba(56, 189, 248, 0.6)',
+                          }}
+                        >
+                          {tag}
+                        </motion.span>
+                      ))}
+                    </div>
+                    
+                    <motion.h3 
+                      className="text-lg sm:text-xl md:text-2xl font-semibold text-white mb-2 sm:mb-3 group-hover:text-sky-200 transition-colors"
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: index * 0.2 + 0.5 }}
+                    >
+                      {event.title}
+                    </motion.h3>
+                    
+                    <motion.p 
+                      className="text-xs sm:text-sm text-slate-300 leading-relaxed mb-3 sm:mb-4"
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: index * 0.2 + 0.6 }}
+                    >
+                      {event.description}
+                    </motion.p>
+                  </div>
+                </motion.div>
+              </motion.div>
+            ))}
+          </motion.div>
+        </AnimatePresence>
+      </div>
+    </div>
+  );
+};
+
+// Image Carousel Component
+const ImageCarousel: FC = () => {
+  const [screenWidth, setScreenWidth] = useState(0);
+
+  const cardsPerView = 4;
+  const gap = 16; // gap between cards in pixels
+
+  useEffect(() => {
+    const updateWidth = () => {
+      setScreenWidth(window.innerWidth);
+    };
+
+    updateWidth();
+    window.addEventListener('resize', updateWidth);
+    return () => window.removeEventListener('resize', updateWidth);
+  }, []);
+
+  // Calculate card size based on full screen width to show exactly 4 cards
+  // Account for gaps between cards
+  const cardSize = screenWidth > 0 
+    ? Math.floor((screenWidth - (gap * (cardsPerView - 1))) / cardsPerView)
+    : 300;
+
+  // Duplicate images for seamless loop (2 sets is enough for smooth looping)
+  const duplicatedImages = useMemo(() => [...CAROUSEL_IMAGES, ...CAROUSEL_IMAGES], []);
+
+  // Calculate total distance to scroll (one full set of images)
+  const scrollDistance = useMemo(
+    () => (cardSize + gap) * CAROUSEL_IMAGES.length,
+    [cardSize, gap]
+  );
+
+  return (
+    <div 
+      className="relative overflow-hidden"
+      style={{ 
+        width: '100vw',
+        marginLeft: 'calc(-50vw + 50%)',
+        marginRight: 'calc(-50vw + 50%)',
+      }}
+    >
+      <div 
+        className="relative overflow-hidden"
+        style={{
+          height: `${cardSize}px`,
+          width: '100vw',
+          willChange: 'contents',
+        }}
+      >
+        <motion.div
+          className="flex items-center h-full"
+          style={{
+            gap: `${gap}px`,
+            willChange: 'transform',
+            backfaceVisibility: 'hidden',
+            transform: 'translateZ(0)',
+          }}
+          animate={{
+            x: screenWidth > 0 ? [0, -scrollDistance] : 0,
+          }}
+          transition={{
+            x: {
+              repeat: Infinity,
+              repeatType: "loop",
+              duration: CAROUSEL_IMAGES.length * 4,
+              ease: "linear",
+            },
+          }}
+        >
+          {duplicatedImages.map((image, index) => (
+            <div
+              key={`${image}-${index}`}
+              className="flex-shrink-0 relative group"
+              style={{
+                width: `${cardSize}px`,
+                height: `${cardSize}px`,
+                willChange: 'transform',
+                backfaceVisibility: 'hidden',
+              }}
+            >
+              <div className="absolute inset-0 rounded-xl sm:rounded-2xl border border-white/20 bg-white/5 overflow-hidden">
+                <img
+                  src={image}
+                  alt={`UTKRISHTA Previous Year ${(index % CAROUSEL_IMAGES.length) + 1}`}
+                  className="w-full h-full object-cover grayscale transition-all duration-500 ease-in-out group-hover:grayscale-0"
+                  loading="lazy"
+                  style={{
+                    willChange: 'filter',
+                    backfaceVisibility: 'hidden',
+                  }}
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/40 via-transparent to-transparent pointer-events-none" />
+              </div>
+            </div>
+          ))}
+        </motion.div>
       </div>
     </div>
   );
@@ -220,50 +566,238 @@ const heroCardVariants: Variants = {
   },
 };
 
-const events = [
-  {
-    title: 'RECURSIA',
-    description:
-      'A collaborative hackathon where interdisciplinary teams prototype innovative solutions and showcase their coding prowess in a competitive environment.',
-    tags: ['Hackathon', 'Technical', 'Competition'],
-    schedule: 'Nov 1 • 3:30 PM • G04',
-  },
-  {
-    title: 'NEURAL NEXUS',
-    description:
-      'An exciting technical event focused on AI and machine learning challenges that test your problem-solving skills and innovation.',
-    tags: ['AI/ML', 'Technical', 'Epoch'],
-    schedule: 'Nov 1 • Post-Inauguration • G04',
-  },
-  {
-    title: 'BATTLE OF BEATS AND VOICES',
-    description:
-      'Showcase your musical and vocal talents in this thrilling competition where rhythm meets creativity. A platform for artists to shine.',
-    tags: ['Cultural', 'Music', 'Performance'],
-    schedule: 'Nov 1 • 5:45 PM • Reverb',
-  },
-  {
-    title: 'CHAKRAVYUH',
-    description:
-      'Navigate through complex technical and algorithmic challenges in this brain-teasing competition organized by GDG.',
-    tags: ['Technical', 'GDG', 'Competition'],
-    schedule: 'Nov 4 & 5 • 5:45 PM & 9:30 AM',
-  },
-  {
-    title: 'DATA X HUNTER',
-    description:
-      'Test your data science skills in this intensive competition where you analyze, visualize, and extract insights from complex datasets.',
-    tags: ['Data Science', 'Technical', 'Matrix'],
-    schedule: 'Nov 5 • 5:30 PM',
-  },
-  {
-    title: 'CINEMATIC ESSENCE',
-    description:
-      'Capture and present your photography and videography skills in this creative showcase organized by F-Stops.',
-    tags: ['Cultural', 'Photography', 'Creative'],
-    schedule: 'Nov 5 • 3:00 PM • Online',
-  },
-];
+// Events organized by day (Day 1 = Nov 1, Day 2 = Nov 2, etc.) - All 31 events from schedule page
+const eventsByDay: Record<number, Array<{
+  title: string;
+  description: string;
+  tags: string[];
+  time: string;
+}>> = {
+  1: [
+    {
+      title: 'Inauguration',
+      description: 'Official opening ceremony of UTKRISHTA 2025',
+      tags: ['Opening', 'Ceremony'],
+      time: '11:00 AM',
+    },
+    {
+      title: 'ElectroQuest',
+      description: 'An electrifying technical event organized by Connexion.',
+      tags: ['Technical', 'Connexion'],
+      time: 'Post-Inauguration',
+    },
+    {
+      title: 'Synergia',
+      description: 'A collaborative technical challenge organized by Nexsync.',
+      tags: ['Technical', 'Nexsync'],
+      time: 'Post-Inauguration',
+    },
+    {
+      title: 'Neural Nexus',
+      description: 'An AI and machine learning focused event organized by Epoch.',
+      tags: ['AI/ML', 'Technical', 'Epoch'],
+      time: 'Post-Inauguration',
+    },
+    {
+      title: 'Problem Statement Declaration',
+      description: 'Official announcement of problem statements for various competitions.',
+      tags: ['Official'],
+      time: '12:00 PM',
+    },
+    {
+      title: 'Recursia',
+      description: 'A hackathon discussion and competition organized by Gradient.',
+      tags: ['Hackathon', 'Technical', 'Gradient'],
+      time: '3:30 PM - 5:30 PM',
+    },
+    {
+      title: 'Battle of Beats and Voices',
+      description: 'A musical and vocal competition organized by Reverb.',
+      tags: ['Cultural', 'Music', 'Performance', 'Reverb'],
+      time: '5:45 PM - 6:45 PM',
+    },
+    {
+      title: 'Free Fire',
+      description: 'Gaming tournament featuring Free Fire, starting with knockout stage.',
+      tags: ['Gaming', 'Esports'],
+      time: '5:45 PM',
+    },
+  ],
+  2: [
+    {
+      title: 'Snakes and Coderssss',
+      description: 'A coding competition with a twist, organized by Enigma.',
+      tags: ['Technical', 'Coding', 'Enigma'],
+      time: '9:30 AM - 10:30 AM',
+    },
+    {
+      title: 'Origin of Universe',
+      description: 'An exploration event organized by Nirvana.',
+      tags: ['Technical', 'Nirvana'],
+      time: '9:30 AM - 10:30 AM',
+    },
+    {
+      title: 'Gully Cricket',
+      description: 'An exciting cricket tournament bringing sportsmanship and competition together.',
+      tags: ['Sports', 'Cricket'],
+      time: '9:30 AM - 8:30 PM',
+    },
+    {
+      title: 'Frame by Frame',
+      description: 'A creative photography and videography event organized by Mise-en-scène.',
+      tags: ['Cultural', 'Photography', 'Creative', 'Mise-en-scène'],
+      time: '3:00 PM - 4:30 PM',
+    },
+    {
+      title: 'Ludo King',
+      description: 'A fun gaming competition featuring the classic board game.',
+      tags: ['Gaming', 'Casual'],
+      time: '4:30 PM - 5:30 PM',
+    },
+    {
+      title: 'CineRemake',
+      description: 'A creative filmmaking challenge organized by Mise-en-scène.',
+      tags: ['Cultural', 'Filmmaking', 'Creative', 'Mise-en-scène'],
+      time: '5:45 PM - 6:45 PM',
+    },
+  ],
+  3: [
+    {
+      title: 'Snakes and Coderssss',
+      description: 'A coding competition with a twist, organized by Enigma.',
+      tags: ['Technical', 'Coding', 'Enigma'],
+      time: '5:45 PM - 7:45 PM',
+    },
+    {
+      title: 'CSS Battle',
+      description: 'A web design and CSS competition organized by IOTA.',
+      tags: ['Technical', 'Web Design', 'IOTA'],
+      time: '5:45 PM - 7:45 PM',
+    },
+    {
+      title: 'Dance Till You Drop',
+      description: 'A high-energy dance competition organized by Beatripperzz.',
+      tags: ['Cultural', 'Dance', 'Performance', 'Beatripperzz'],
+      time: '5:45 PM - 7:45 PM',
+    },
+    {
+      title: 'Smash Karts',
+      description: 'An exciting kart racing gaming tournament.',
+      tags: ['Gaming', 'Racing'],
+      time: '5:45 PM - 7:45 PM',
+    },
+  ],
+  4: [
+    {
+      title: 'CSS Battle',
+      description: 'A web design and CSS competition organized by IOTA.',
+      tags: ['Technical', 'Web Design', 'IOTA'],
+      time: '5:45 PM - 7:45 PM',
+    },
+    {
+      title: 'Chakravyuh',
+      description: 'Navigate through complex challenges in this technical competition organized by GDG.',
+      tags: ['Technical', 'GDG', 'Competition'],
+      time: '5:45 PM - 7:45 PM',
+    },
+    {
+      title: 'Face Painting',
+      description: 'A creative artistic event organized by Meraki.',
+      tags: ['Cultural', 'Art', 'Creative', 'Meraki'],
+      time: '5:45 PM - 7:45 PM',
+    },
+    {
+      title: 'Valorant',
+      description: 'Competitive Valorant gaming tournament.',
+      tags: ['Gaming', 'Esports', 'FPS'],
+      time: '5:45 PM - 7:45 PM',
+    },
+  ],
+  5: [
+    {
+      title: 'Chakravyuh',
+      description: 'Navigate through complex challenges in this technical competition organized by GDG.',
+      tags: ['Technical', 'GDG', 'Competition'],
+      time: '9:30 AM - 10:30 AM',
+    },
+    {
+      title: 'Debattle: The Oxford Style',
+      description: 'A formal debate competition in Oxford style format organized by Keynote.',
+      tags: ['Debate', 'Keynote', 'Academic'],
+      time: '9:30 AM - 10:30 AM',
+    },
+    {
+      title: 'Dodge Ball',
+      description: 'An energetic sports tournament featuring dodgeball.',
+      tags: ['Sports', 'Dodgeball'],
+      time: '9:30 AM - 6:30 PM',
+    },
+    {
+      title: 'Cinematic Essence',
+      description: 'A photography and videography showcase organized by F-Stops.',
+      tags: ['Cultural', 'Photography', 'Creative', 'F-Stops'],
+      time: '3:00 PM - 4:30 PM',
+    },
+    {
+      title: 'Powerlifting',
+      description: 'A strength competition showcasing physical prowess.',
+      tags: ['Sports', 'Strength', 'Fitness'],
+      time: '3:00 PM - 4:30 PM',
+    },
+    {
+      title: 'Battle of Drills',
+      description: 'A fitness and drill competition organized by Health and Fitness Club.',
+      tags: ['Sports', 'Fitness', 'Health and Fitness Club'],
+      time: '4:30 PM - 5:30 PM',
+    },
+    {
+      title: 'E-Sell Event',
+      description: 'An entrepreneurial event focused on selling and marketing skills.',
+      tags: ['Business', 'Entrepreneurship'],
+      time: '4:30 PM - 5:30 PM',
+    },
+    {
+      title: 'Data X Hunter',
+      description: 'A data science competition organized by Matrix.',
+      tags: ['Data Science', 'Technical', 'Matrix'],
+      time: '5:30 PM - 7:30 PM',
+    },
+    {
+      title: 'Face Off Frenzy',
+      description: 'An exciting competition organized by Beatripperzz.',
+      tags: ['Cultural', 'Competition', 'Beatripperzz'],
+      time: '5:30 PM - 7:30 PM',
+    },
+  ],
+  6: [
+    {
+      title: 'Battle of Drills',
+      description: 'A fitness and drill competition organized by Health and Fitness Club.',
+      tags: ['Sports', 'Fitness', 'Health and Fitness Club'],
+      time: '5:45 PM - 7:45 PM',
+    },
+    {
+      title: 'SellFiesta',
+      description: 'An entrepreneurial selling competition organized by E-Cell.',
+      tags: ['Business', 'Entrepreneurship', 'E-Cell'],
+      time: '5:45 PM - 7:45 PM',
+    },
+    {
+      title: 'BGMI',
+      description: 'BattleGrounds Mobile India gaming tournament.',
+      tags: ['Gaming', 'Esports', 'Mobile'],
+      time: '5:45 PM - 7:45 PM',
+    },
+  ],
+  7: [
+    {
+      title: 'Closure Ceremony',
+      description: 'The grand closing ceremony of UTKRISHTA 2025.',
+      tags: ['Closing', 'Ceremony'],
+      time: '5:45 PM - 7:45 PM',
+    },
+  ],
+};
 
 const faqs = [
   {
@@ -740,30 +1274,7 @@ const TechfestLandingPage: FC = () => {
             </Link>
           </div>
 
-          <div className="grid gap-5 sm:gap-6 md:gap-8 md:grid-cols-2 lg:grid-cols-3">
-            {events.map((event) => (
-              <div
-                key={event.title}
-                className="flex h-full flex-col justify-between rounded-2xl sm:rounded-3xl border border-white/10 bg-white/5 p-4 sm:p-5 md:p-6 backdrop-blur"
-              >
-                <div>
-                  <span className="text-[0.65rem] sm:text-xs uppercase tracking-[0.35em] sm:tracking-[0.45em] text-sky-300">Featured Event</span>
-                  <h3 className="mt-3 sm:mt-4 text-xl sm:text-2xl font-semibold text-white">{event.title}</h3>
-                  <p className="mt-2 sm:mt-3 text-xs sm:text-sm text-slate-300">{event.description}</p>
-                </div>
-                <div className="mt-4 sm:mt-5 md:mt-6 space-y-2 sm:space-y-3 text-[0.65rem] sm:text-xs uppercase tracking-[0.3em] sm:tracking-[0.4em] text-slate-400">
-                  <div className="flex flex-wrap gap-1.5 sm:gap-2">
-                    {event.tags.map((tag) => (
-                      <span key={tag} className="rounded-full bg-white/10 px-2.5 sm:px-3 py-1 text-[0.55rem] sm:text-[0.6rem] text-sky-200">
-                        {tag}
-                      </span>
-                    ))}
-                  </div>
-                  <p className="text-slate-200 text-xs sm:text-sm">{event.schedule}</p>
-                </div>
-              </div>
-            ))}
-          </div>
+          <EventsTimeline />
         </motion.section>
 
         <motion.section
