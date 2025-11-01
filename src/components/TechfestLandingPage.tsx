@@ -503,29 +503,6 @@ const ImageCarousel: FC = () => {
   );
 };
 
-// Target timestamp aligns with 1 Nov 2025, 00:00 IST (UTC+5:30)
-const TARGET_EVENT_DATE = new Date('2025-10-31T18:30:00Z');
-
-type TimeRemaining = {
-  total: number;
-  days: number;
-  hours: number;
-  minutes: number;
-  seconds: number;
-};
-
-const computeTimeRemaining = (): TimeRemaining => {
-  const now = Date.now();
-  const total = Math.max(TARGET_EVENT_DATE.getTime() - now, 0);
-
-  const days = Math.floor(total / (1000 * 60 * 60 * 24));
-  const hours = Math.floor((total / (1000 * 60 * 60)) % 24);
-  const minutes = Math.floor((total / (1000 * 60)) % 60);
-  const seconds = Math.floor((total / 1000) % 60);
-
-  return { total, days, hours, minutes, seconds };
-};
-
 const easeOutExpo = [0.22, 1, 0.36, 1] as const;
 
 const pageVariants: Variants = {
@@ -948,18 +925,9 @@ const FooterDivider: FC = () => (
 );
 
 const TechfestLandingPage: FC = () => {
-  const [timeLeft, setTimeLeft] = useState<TimeRemaining>(() => computeTimeRemaining());
   const [logoSequenceComplete, setLogoSequenceComplete] = useState(false);
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-
-  useEffect(() => {
-    const intervalId = window.setInterval(() => {
-      setTimeLeft(computeTimeRemaining());
-    }, 1000);
-
-    return () => window.clearInterval(intervalId);
-  }, []);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -1022,13 +990,7 @@ const TechfestLandingPage: FC = () => {
     }
   }, []);
 
-  const countdownItems = [
-    { label: 'Days', value: Math.min(timeLeft.days, 999), pad: 1 },
-    { label: 'Hours', value: timeLeft.hours, pad: 2 },
-    { label: 'Minutes', value: timeLeft.minutes, pad: 2 },
-    { label: 'Seconds', value: timeLeft.seconds, pad: 2 },
-  ];
-  const eventStarted = timeLeft.total === 0;
+  const liveAnnouncement = "UTKRISHTA IS LIVE — DIVE IN AND CLAIM YOUR COLLAB POD. DON'T FORGET TO REGISTER VIA CAMPUS LIFE APP!";
   const animationState = logoSequenceComplete ? 'visible' : 'hidden';
 
   return (
@@ -1239,33 +1201,39 @@ const TechfestLandingPage: FC = () => {
                 className="mt-8 sm:mt-10 w-full max-w-2xl px-2 sm:px-0"
                 variants={heroCardVariants}
               >
-                <div className="rounded-2xl sm:rounded-3xl border border-sky-500/40 bg-slate-950/70 p-4 sm:p-5 md:p-6 shadow-lg shadow-sky-500/20 backdrop-blur">
-                  <div className="flex flex-wrap items-center justify-between gap-2 sm:gap-3 text-xs uppercase tracking-[0.35em] sm:tracking-[0.45em] text-sky-200">
-                    <span>THE COUNTDOWN IS FINAL. BE READY.</span>
-                    <span className="text-sky-100">Nov 01</span>
-                  </div>
-                  <div className="mt-3 sm:mt-4 md:mt-6 grid grid-cols-2 gap-1.5 sm:gap-2 md:gap-3 lg:gap-4 sm:grid-cols-4">
-                    {countdownItems.map((item) => (
-                      <div
-                        key={item.label}
-                        className="relative overflow-hidden rounded-xl sm:rounded-2xl border border-sky-500/30 bg-slate-900/80 p-2.5 sm:p-3 md:p-4 shadow-inner shadow-sky-500/10"
-                      >
-                        <span
-                          className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(56,189,248,0.25),transparent_70%)]"
-                          aria-hidden="true"
-                        />
-                        <span className="relative z-10 text-[0.55rem] sm:text-[0.6rem] md:text-[0.65rem] uppercase tracking-[0.4em] sm:tracking-[0.5em] md:tracking-[0.6em] text-sky-300">{item.label}</span>
-                        <span className="relative z-10 mt-1 sm:mt-2 block text-xl sm:text-2xl md:text-3xl lg:text-4xl font-semibold text-white">
-                          {item.value.toString().padStart(item.pad, '0')}
+                <div className="relative overflow-hidden rounded-2xl sm:rounded-3xl border border-sky-500/40 bg-slate-950/70 p-5 sm:p-6 md:p-7 shadow-lg shadow-sky-500/20 backdrop-blur">
+                  <motion.div
+                    className="pointer-events-none absolute -inset-px rounded-[inherit] bg-gradient-to-br from-sky-500/20 via-transparent to-blue-500/10"
+                    aria-hidden="true"
+                    animate={{ opacity: [0.35, 0.6, 0.35] }}
+                    transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut' }}
+                  />
+                  <div className="relative z-10 flex flex-col items-center gap-4 sm:gap-5 text-center">
+                    <div className="flex w-full flex-wrap items-center justify-between gap-3 text-[0.55rem] sm:text-xs uppercase tracking-[0.35em] sm:tracking-[0.45em] text-sky-200">
+                      <span className="flex items-center gap-2">
+                        <span className="flex h-2 w-2 items-center justify-center">
+                          <span className="h-2 w-2 rounded-full bg-sky-400 shadow-[0_0_12px_rgba(56,189,248,0.8)] animate-pulse" />
                         </span>
-                      </div>
-                    ))}
+                        Live transmission
+                      </span>
+                      <span className="text-sky-100">Nov 01</span>
+                    </div>
+                    <div className="relative w-full overflow-hidden rounded-xl sm:rounded-2xl border border-sky-500/40 bg-slate-900/70 p-4 sm:p-5 md:p-6 shadow-inner shadow-sky-500/20">
+                      <span
+                        className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(56,189,248,0.28),transparent_65%)]"
+                        aria-hidden="true"
+                      />
+                      <motion.div
+                        className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-sky-400/50 to-transparent"
+                        animate={{ opacity: [0.2, 0.8, 0.2] }}
+                        transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
+                      />
+                      <p className="relative z-10 text-[0.7rem] sm:text-[0.85rem] md:text-base font-semibold uppercase tracking-[0.28em] sm:tracking-[0.35em] text-sky-100">
+                        {liveAnnouncement}
+                      </p>
+                    </div>
+                 
                   </div>
-                  <p className="mt-4 sm:mt-5 md:mt-6 text-[0.65rem] sm:text-xs uppercase tracking-[0.25em] sm:tracking-[0.30em] text-slate-400 px-1 sm:px-0">
-                    {eventStarted
-                      ? 'UTKRISHTA is live — dive in and claim your collab pod. Don\'t forget to register via campus life app!'
-                      : 'Sync your crew. Gates open sharp at midnight on November 1st. Download campus life app to register.'}
-                  </p>
                 </div>
               </motion.div>
             </motion.div>
