@@ -252,7 +252,7 @@ const eventDetails: EventDetail[] = [
     date: 'November 5, 2025 • 4:30 PM - 5:30 PM\nNovember 6, 2025 • 5:45 PM - 7:45 PM',
   },
   {
-    title: 'E-Sell Event',
+    title: 'Sellfiesta',
     description: 'An entrepreneurial event focused on selling and marketing skills.',
     tags: ['Business', 'Entrepreneurship'],
     schedule: 'Nov 5 • 4:30 PM - 5:30 PM',
