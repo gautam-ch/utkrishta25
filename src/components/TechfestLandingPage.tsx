@@ -778,7 +778,7 @@ const eventsByDay: Record<number, Array<{
       time: '4:30 PM - 5:30 PM',
     },
     {
-      title: 'E-Sell Event',
+      title: 'Sellfiesta Event',
       description: 'An entrepreneurial event focused on selling and marketing skills.',
       tags: ['Business', 'Entrepreneurship'],
       time: '4:30 PM - 5:30 PM',
